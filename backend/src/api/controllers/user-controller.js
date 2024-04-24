@@ -1,4 +1,5 @@
 const HttpStatus = require("http-status-codes").StatusCodes;
+const logger = require("../../config/logger");
 const userService = require("../services/user-service");
 
 const me = async (req, res, next) => {
@@ -11,4 +12,13 @@ const searchByEmail = async (req, res, next) => {
   return res.status(HttpStatus.OK).json({ users });
 };
 
-module.exports = { me, searchByEmail };
+const uploadAvatar = async (req, res, next) => {
+  try {
+    const url = await userService.uploadAvatar(req.userId, req.file);
+    return res.status(HttpStatus.OK).json({ url });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { me, searchByEmail, uploadAvatar };

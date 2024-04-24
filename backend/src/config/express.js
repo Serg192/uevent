@@ -5,6 +5,7 @@ const https = require("https");
 const path = require("path");
 const fs = require("fs");
 const limiter = require("express-rate-limit");
+const HttpStatus = require("http-status-codes").StatusCodes;
 const app = express();
 
 const router = require("../api/routes");
@@ -37,7 +38,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode ? err.statusCode : res.statusCode;
+  const statusCode = err.statusCode
+    ? err.statusCode
+    : HttpStatus.INTERNAL_SERVER_ERROR;
 
   logger.error(`CODE: ${statusCode}, msg: ${err.message}, stack: ${err.stack}`);
   res.status(statusCode).json({

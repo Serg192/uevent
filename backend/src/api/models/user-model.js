@@ -24,6 +24,9 @@ const UserModel = new Schema(
       enum: ROLES,
       default: "user",
     },
+    profilePicture: {
+      type: String,
+    },
     emailVerified: {
       type: Boolean,
       default: false,
