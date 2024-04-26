@@ -51,6 +51,19 @@ const updateCompany = async (companyData, companyId) => {
   }
 
   if (companyData.email) companyData.emailVerified = false;
+
+  if (companyData.lat || companyData.long) {
+    const { lat, long } = companyData;
+    const company = await Company.findById(companyId);
+    companyData.location = {
+      type: "Point",
+      coordinates: [
+        lat ? lat : company.location.coordinates[0],
+        long ? long : company.location.coordinates[1],
+      ],
+    };
+  }
+
   return await Company.findByIdAndUpdate({ _id: companyId }, companyData, {
     new: true,
   });

@@ -14,7 +14,8 @@ const CreateEvent = Joi.object({
     .valid(...FORMATS),
   themes: Joi.array()
     .items(Joi.string().valid(...THEMES))
-    .required(),
+    .required()
+    .min(1),
 });
 
 const UpdateEvent = Joi.object({
@@ -26,7 +27,9 @@ const UpdateEvent = Joi.object({
   lat: Joi.number().min(LAT.min).max(LAT.max),
   long: Joi.number().min(LONG.min).max(LONG.max),
   format: Joi.string().valid(...FORMATS),
-  themes: Joi.array().items(Joi.string().valid(...THEMES)),
+  themes: Joi.array()
+    .items(Joi.string().valid(...THEMES))
+    .min(1),
 });
 
 module.exports = { CreateEvent, UpdateEvent };
