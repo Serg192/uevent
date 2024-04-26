@@ -34,7 +34,9 @@ const uploadAvatar = async (userId, file) => {
     try {
       const pictureKey = oldProfilePicUrl.split("/");
       await s3Service.deleteFile(pictureKey.pop());
-    } catch (err) {}
+    } catch (err) {
+      logger.error(err.message);
+    }
   }
 
   try {
