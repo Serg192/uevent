@@ -22,6 +22,11 @@ const connectToStripe = async (req, res) => {
   return res.status(HttpStatus.OK).json({ url });
 };
 
+const getStripeAccount = async (req, res) => {
+  const url = await companyService.getStripeAccount(req.params.id);
+  return res.status(HttpStatus.OK).json({ url });
+};
+
 const getMyCompanies = async (req, res) => {
   const data = await companyService.getUserCompanies(req.userId);
   return res.status(HttpStatus.OK).json({ data });
@@ -45,6 +50,7 @@ module.exports = {
   updateCompany,
   uploadLogo,
   connectToStripe,
+  getStripeAccount,
   getMyCompanies,
   getFollowedCompanies,
   toggleFollowStatus,

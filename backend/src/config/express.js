@@ -11,12 +11,21 @@ const app = express();
 const router = require("../api/routes");
 const logger = require("./logger");
 
+const paymentController = require("../api/controllers/payment-controller");
+const { catchAsyncErr } = require("../api/middlewares/error-boundary");
+
 // max 60 requests per 1 minute
 app.use(
   limiter({
     windowMs: 1 * 60 * 1000,
     max: 60,
   })
+);
+
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  catchAsyncErr(paymentController.webhook)
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -1,5 +1,16 @@
 const logger = require("../../config/logger");
 
+function parsePagination(req) {
+  let { page, pageSize } = req.query;
+  if (!page || page <= 0) page = 1;
+  if (!pageSize || pageSize <= 0) pageSize = 10;
+
+  return {
+    page,
+    pageSize,
+  };
+}
+
 async function paginate(model, paginationOpt, filter, projection) {
   const { page, pageSize, sort } = paginationOpt;
   const skip = (page - 1) * pageSize;
@@ -16,4 +27,4 @@ async function paginate(model, paginationOpt, filter, projection) {
   return { data, currentPage: page, pageSize, total };
 }
 
-module.exports = { paginate };
+module.exports = { paginate, parsePagination };

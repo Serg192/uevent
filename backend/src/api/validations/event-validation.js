@@ -32,4 +32,14 @@ const UpdateEvent = Joi.object({
     .min(1),
 });
 
-module.exports = { CreateEvent, UpdateEvent };
+const CreatePromoCode = Joi.object({
+  code: Joi.string().min(5).max(50).required(),
+  discount: Joi.number().required().min(1).max(95),
+});
+
+const UpdatePromoCode = Joi.object({
+  code: Joi.string().min(5).max(50),
+  discount: Joi.number().min(1).max(95),
+});
+
+module.exports = { CreateEvent, UpdateEvent, CreatePromoCode, UpdatePromoCode };

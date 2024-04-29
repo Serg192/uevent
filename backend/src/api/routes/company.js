@@ -33,12 +33,20 @@ router.post(
   catchAsyncErr(companyController.uploadLogo)
 );
 
+//Stripe
 router.post(
   "/:id/stripe-setup",
   companyGuard,
   catchAsyncErr(companyController.connectToStripe)
 );
 
+router.get(
+  "/:id/stripe-account",
+  companyGuard,
+  catchAsyncErr(companyController.getStripeAccount)
+);
+
+///////////////////
 router.get("/my", catchAsyncErr(companyController.getMyCompanies));
 router.get("/followed", catchAsyncErr(companyController.getFollowedCompanies));
 router.post(

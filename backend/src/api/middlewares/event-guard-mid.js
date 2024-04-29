@@ -30,15 +30,19 @@ function eventGuard(auth = "owner") {
         .json({ message: `Event with id: ${req.params.eid} is spoiled` });
     }
 
-    if (
-      (owner && req.userId.toString() !== company.owner._id.toString()) ||
-      (!owner && req.userId.toString() === company.owner._id.toString())
-    ) {
-      return res
-        .status(HttpStatus.METHOD_NOT_ALLOWED)
-        .json({ message: "You have no permission to perform this action" });
-    } else {
+    if (auth === "any") {
       next();
+    } else {
+      if (
+        (owner && req.userId.toString() !== company.owner._id.toString()) ||
+        (!owner && req.userId.toString() === company.owner._id.toString())
+      ) {
+        return res
+          .status(HttpStatus.METHOD_NOT_ALLOWED)
+          .json({ message: "You have no permission to perform this action" });
+      } else {
+        next();
+      }
     }
   };
 }
