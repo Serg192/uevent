@@ -4,3 +4,4 @@ export { default as Signup } from "./Signup";
 export { default as VerifyEmail } from "./VerifyEmail";
 export { default as ForgotPassword } from "./ForgotPassword";
 export { default as VerifyPasswordReset } from "./VerifyPasswordReset";
+export { default as Events } from "./Events";

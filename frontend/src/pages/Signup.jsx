@@ -5,8 +5,11 @@ import {
   Typography,
   Container,
   Grid,
+  IconButton,
+  InputAdornment,
   Link,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../features/auth/authSlice";
@@ -14,29 +17,51 @@ import { useSignupMutation } from "../features/auth/authApiSlice";
 
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 
-// import "../forms.css";
-
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false);
 
   const [signup] = useSignupMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Move to separate file
+  const PASSWORD_REGEX =
+    /^(?=.*[A-Z])(?=.*[!@#$&%^_+=()\\\[\]{};:<>.,|?\-\/*])(?=.*[0-9])(?=.*[a-z]).{10,}$/m;
+  const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
   const handleSubmit = async (e) => {
-    try {
-      const userData = await signup({ username, email, password }).unwrap();
-      console.log("User data", userData);
-      dispatch(setCredentials({ ...userData }));
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      navigate("/login");
-    } catch (err) {
-      // handle errors
-      console.log(err);
+    setPasswordError(false);
+    setConfirmPasswordError(false);
+
+    console.log(username.length);
+    if (username.length <= 4 || username.length >= 100) {
+      setUsernameError(true);
+    } else if (!EMAIL_REGEX.test(email)) {
+      setEmailError(true);
+    } else if (!PASSWORD_REGEX.test(password)) {
+      setPasswordError(true);
+    } else if (password !== confirmPassword) {
+      setConfirmPasswordError(true);
+    } else {
+      try {
+        const userData = await signup({ username, email, password }).unwrap();
+        console.log("User data", userData);
+        dispatch(setCredentials({ ...userData }));
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        navigate("/login");
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
@@ -69,34 +94,82 @@ const Signup = () => {
                 label="Username"
                 type="text"
                 variant="outlined"
+                required
                 fullWidth
                 margin="normal"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                error={usernameError}
+                helperText={usernameError ? "Username should not be empty" : ""}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setUsernameError(
+                    username.length <= 4 || username.length >= 100
+                  );
+                }}
               />
             </Grid>
             <Grid item>
               <TextField
-                id="email"
+                fullWidth
                 label="Email"
-                type="email"
                 variant="outlined"
-                fullWidth
-                margin="normal"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                required
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(!EMAIL_REGEX.test(email));
+                }}
+                error={emailError}
+                helperText={emailError ? "Please enter a valid email" : ""}
+                sx={{ mt: 2 }}
               />
             </Grid>
             <Grid item>
               <TextField
-                id="password"
-                label="Password"
-                type="password"
-                variant="outlined"
                 fullWidth
-                margin="normal"
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                variant="outlined"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                required
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError(!PASSWORD_REGEX.test(password));
+                }}
+                error={passwordError}
+                helperText={
+                  passwordError ? "Please enter a valid password" : ""
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                type={showPassword ? "text" : "password"}
+                variant="outlined"
+                value={confirmPassword}
+                required
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                }}
+                error={confirmPasswordError}
+                helperText={
+                  confirmPasswordError ? "Passwords do not match" : ""
+                }
+                sx={{ mt: 2 }}
               />
             </Grid>
             <Grid item>
@@ -105,6 +178,7 @@ const Signup = () => {
                 color="primary"
                 fullWidth
                 onClick={handleSubmit}
+                sx={{ mt: 2 }}
               >
                 Sign Up
               </Button>
