@@ -5,3 +5,4 @@ export { default as VerifyEmail } from "./VerifyEmail";
 export { default as ForgotPassword } from "./ForgotPassword";
 export { default as VerifyPasswordReset } from "./VerifyPasswordReset";
 export { default as Events } from "./Events";
+export { default as Companies } from "./Companies";

@@ -7,6 +7,7 @@ import {
   Typography,
   Stack,
   Button,
+  Avatar,
 } from "@mui/material";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -22,13 +23,13 @@ const navbarButtons = [
 
 const Navbar = () => {
   const [tab, setTab] = useState(0);
-  const currentUser = useSelector(selectCurrentUser);
+  const userData = useSelector(selectCurrentUser);
 
   const [logoutFromUevent] = useLogoutMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("Current user", currentUser);
+  console.log("Current user", userData?.user?.profilePicture);
 
   const handleLogout = async () => {
     try {
@@ -81,16 +82,26 @@ const Navbar = () => {
           )}
         </Tabs>
         <Stack direction="row" spacing={2}>
-          {currentUser && (
-            <Button
-              onClick={() => handleLogout()}
-              color="warning"
-              variant="contained"
-            >
-              Log out
-            </Button>
+          {userData && (
+            <>
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                <Avatar
+                  src={userData?.user?.profilePicture}
+                  sx={{ width: 32, height: 32 }}
+                />
+                <Typography variant="h5">{userData?.user?.username}</Typography>
+              </Stack>
+
+              <Button
+                onClick={() => handleLogout()}
+                color="warning"
+                variant="contained"
+              >
+                Log out
+              </Button>
+            </>
           )}
-          {!currentUser && (
+          {!userData && (
             <>
               <Button
                 onClick={() => {

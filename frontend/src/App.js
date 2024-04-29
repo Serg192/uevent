@@ -6,6 +6,7 @@ import {
   ForgotPassword,
   VerifyPasswordReset,
   Events,
+  Companies,
 } from "./pages";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -18,6 +19,7 @@ const App = () => (
       <Navbar />
       <Routes>
         <Route path="/" element={<Events />} />
+        <Route path="/companies" element={<Companies />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
