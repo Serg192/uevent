@@ -106,6 +106,18 @@ const connectToStripe = async (companyId) => {
   return await paymentService.getOnboardingLink(company.stripeId);
 };
 
+const getStripeAccount = async (companyId) => {
+  const company = await Company.findById(companyId);
+
+  if (!company.stripeId || !paymentService.isAccountValid(company.stripeId)) {
+    throw {
+      statusCode: HttpStatus.METHOD_NOT_ALLOWED,
+      message: "Stripe account is not set up correctly",
+    };
+  }
+  return await paymentService.createLoginLink(company.stripeId);
+};
+
 const getUserCompanies = async (userId) => {
   return await Company.find({ owner: userId }).select("-stripeId");
 };
@@ -146,6 +158,7 @@ module.exports = {
   updateCompany,
   uploadLogo,
   connectToStripe,
+  getStripeAccount,
   getUserCompanies,
   getFollowedCompanies,
   toggleFollowStatus,
