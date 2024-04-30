@@ -5,6 +5,7 @@ const s3Service = require("./s3-service");
 
 const User = require("../models/user-model");
 const Company = require("../models/company-model");
+const { paginate } = require("../helpers/pagination-helper");
 
 const createCompany = async (companyData, userId) => {
   const companyEmailUsed = await Company.findOne({ email: companyData.email });
@@ -118,14 +119,32 @@ const getStripeAccount = async (companyId) => {
   return await paymentService.createLoginLink(company.stripeId);
 };
 
-const getUserCompanies = async (userId) => {
-  return await Company.find({ owner: userId }).select("-stripeId");
-};
-
-const getFollowedCompanies = async (userId) => {
-  return await Company.find({ followers: { $in: [userId] } }).select(
+const getUserCompanies = async (pagination, userId) => {
+  return await paginate(
+    Company,
+    pagination,
+    { owner: userId },
+    null,
     "-stripeId"
   );
+  //return await Company.find({ owner: userId }).select("-stripeId");
+};
+
+const getFollowedCompanies = async (pagination, userId) => {
+  // return await Company.find({ followers: { $in: [userId] } }).select(
+  //   "-stripeId"
+  // );
+  return await paginate(
+    Company,
+    pagination,
+    { followers: { $in: [userId] } },
+    null,
+    "-stripeId"
+  );
+};
+
+const getAll = async (pagination) => {
+  return await paginate(Company, pagination, null, null, "-stripeId");
 };
 
 const toggleFollowStatus = async (userId, companyId) => {
@@ -161,5 +180,6 @@ module.exports = {
   getStripeAccount,
   getUserCompanies,
   getFollowedCompanies,
+  getAll,
   toggleFollowStatus,
 };

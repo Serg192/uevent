@@ -11,6 +11,6 @@ const router = express.Router();
 router.use("/auth", auth);
 router.use("/events", event);
 router.use("/users", jwtAuth, user);
-router.use("/companies", jwtAuth, company);
+router.use("/companies", company);
 
 module.exports = router;

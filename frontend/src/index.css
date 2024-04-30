@@ -86,3 +86,6 @@ a {
     width: 200px;
   }
 }
+.pac-container {
+  z-index: 100000;
+}

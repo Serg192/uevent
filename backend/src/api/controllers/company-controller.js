@@ -1,5 +1,6 @@
 const HttpStatus = require("http-status-codes").StatusCodes;
 const logger = require("../../config/logger");
+const { parsePagination } = require("../helpers/pagination-helper");
 const companyService = require("../services/company-service");
 
 const createCompany = async (req, res) => {
@@ -28,12 +29,23 @@ const getStripeAccount = async (req, res) => {
 };
 
 const getMyCompanies = async (req, res) => {
-  const data = await companyService.getUserCompanies(req.userId);
+  const pagination = parsePagination(req);
+  const data = await companyService.getUserCompanies(pagination, req.userId);
+  return res.status(HttpStatus.OK).json({ data });
+};
+
+const getAll = async (req, res) => {
+  const pagination = parsePagination(req);
+  const data = await companyService.getAll(pagination);
   return res.status(HttpStatus.OK).json({ data });
 };
 
 const getFollowedCompanies = async (req, res) => {
-  const data = await companyService.getFollowedCompanies(req.userId);
+  const pagination = parsePagination(req);
+  const data = await companyService.getFollowedCompanies(
+    pagination,
+    req.userId
+  );
   return res.status(HttpStatus.OK).json({ data });
 };
 
@@ -52,6 +64,7 @@ module.exports = {
   connectToStripe,
   getStripeAccount,
   getMyCompanies,
+  getAll,
   getFollowedCompanies,
   toggleFollowStatus,
 };
