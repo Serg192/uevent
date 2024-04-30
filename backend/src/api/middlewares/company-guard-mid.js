@@ -38,4 +38,9 @@ async function followCompanyGuard(req, res, next) {
   next();
 }
 
-module.exports = { companyGuard, followCompanyGuard };
+async function companyIdCheck(req, res, next) {
+  await getCompany(req, res);
+  next();
+}
+
+module.exports = { companyGuard, followCompanyGuard, companyIdCheck };

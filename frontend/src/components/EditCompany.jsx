@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Stack,
   Button,
@@ -6,25 +6,36 @@ import {
   Box,
   TextField,
   Typography,
+  Divider,
+  Avatar,
 } from "@mui/material";
 
 import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 
-import { useCreateCompanyMutation } from "../features/company/companyApiSlice";
+import {
+  useCreateCompanyMutation,
+  useUpdateCompanyMutation,
+  useUploadCompanyLogoMutation,
+} from "../features/company/companyApiSlice";
 import { EMAIL_REGEX } from "../const/regex";
 
 const placesLibrary = ["places"];
 
-const CreateCompany = ({ isOpen, setIsOpen }) => {
+const CreateCompany = ({ isOpen, setIsOpen, initData, initAddress }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState(null);
+  const [logo, setLogo] = useState(null);
   const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
 
+  const [file, setFile] = useState();
   const [searchResult, setSearchResult] = useState("");
   const [placeSelected, setPlaceSelected] = useState(false);
 
   const [createCompany] = useCreateCompanyMutation();
+  const [updateCompany] = useUpdateCompanyMutation();
+  const [uploadCompanyLogo] = useUploadCompanyLogoMutation();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -34,10 +45,38 @@ const CreateCompany = ({ isOpen, setIsOpen }) => {
   function onPlaceChanged() {
     if (searchResult != null) {
       setPlaceSelected(true);
+      const place = searchResult.getPlace();
+      setAddress(place.formatted_address);
     } else {
       setPlaceSelected(false);
     }
   }
+
+  const handleImageUpload = async () => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+      try {
+        console.log(formData);
+        const data = await uploadCompanyLogo({
+          id: initData._id,
+          formData,
+        }).unwrap();
+        setLogo(data.url);
+      } catch (err) {
+        console.error("Error uploading photo:", err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (initData) {
+      setName(initData.name);
+      setEmail(initData.email);
+      setLogo(initData.logo);
+      setAddress(initAddress);
+    }
+  }, [isOpen]);
 
   const onSubmit = async () => {
     setNameError(false);
@@ -46,19 +85,33 @@ const CreateCompany = ({ isOpen, setIsOpen }) => {
       setNameError(true);
     } else if (!EMAIL_REGEX.test(email)) {
       setEmailError(true);
-    } else if (!placeSelected) {
+    } else if (!placeSelected && !initData) {
       alert("Choose company location");
     } else {
       const place = searchResult.getPlace();
-      const lat = place.geometry.location.lat();
-      const long = place.geometry.location.lng();
+      const lat = place?.geometry.location.lat();
+      const long = place?.geometry.location.lng();
       try {
-        await createCompany({
-          name,
-          email,
-          lat,
-          long,
-        }).unwrap();
+        if (initData) {
+          //EditMode
+          await updateCompany({
+            id: initData._id,
+            data: {
+              name,
+              email,
+              lat: lat || initData.location.coordinates[0],
+              long: long || initData.location.coordinates[1],
+            },
+          }).unwrap();
+        } else {
+          await createCompany({
+            name,
+            email,
+            lat,
+            long,
+          }).unwrap();
+        }
+
         handleCloseModal();
       } catch (err) {
         if (err.status === 409) {
@@ -72,11 +125,13 @@ const CreateCompany = ({ isOpen, setIsOpen }) => {
   const handleCloseModal = () => {
     setName("");
     setEmail("");
+    setAddress("");
     setNameError(false);
     setEmailError(false);
     setSearchResult(null);
     setPlaceSelected(false);
     setIsOpen(false);
+    setFile(null);
   };
   return (
     <Modal open={isOpen}>
@@ -94,8 +149,51 @@ const CreateCompany = ({ isOpen, setIsOpen }) => {
         }}
       >
         <Typography variant="h4" align="center">
-          Create Company
+          {(initData ? "Edit " : "Create") + "Company"}
         </Typography>
+
+        {initData && (
+          <>
+            <Stack
+              direction="row"
+              mt={2}
+              mb={2}
+              spacing={2}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Avatar
+                alt="Company Logo"
+                src={logo}
+                sx={{ width: 100, height: 100, mb: 2 }}
+              />
+              <Stack direction="column">
+                <input
+                  type="file"
+                  inputProps={{ accept: "image/*" }}
+                  onChange={(e) => {
+                    setFile(e.target.files[0]);
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component="span"
+                  sx={{ mt: 2 }}
+                  onClick={() => handleImageUpload()}
+                >
+                  Upload
+                </Button>
+              </Stack>
+            </Stack>
+            <Divider
+              orientation="horizontal"
+              sx={{ mt: 3, mb: 3, backgroundColor: "gray" }}
+              flexItem
+            />
+          </>
+        )}
+
         <TextField
           id="name"
           label="Name"
@@ -127,6 +225,18 @@ const CreateCompany = ({ isOpen, setIsOpen }) => {
           sx={{ mt: 2 }}
         />
 
+        {address && (
+          <>
+            <Divider
+              orientation="horizontal"
+              sx={{ mt: 3, backgroundColor: "gray" }}
+              flexItem
+            />
+            <Typography mt={2} variant="h5">
+              Address: {address}
+            </Typography>
+          </>
+        )}
         {isLoaded && (
           <Autocomplete
             onPlaceChanged={onPlaceChanged}
@@ -136,7 +246,7 @@ const CreateCompany = ({ isOpen, setIsOpen }) => {
           >
             <input
               type="text"
-              placeholder="Search for Tide Information"
+              placeholder="Start input new Address"
               style={{
                 marginTop: "16px",
                 width: "100%",

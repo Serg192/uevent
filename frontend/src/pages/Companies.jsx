@@ -5,7 +5,7 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import { CompanyPreview, CreateCompany, PageController } from "../components";
+import { CompanyPreview, EditCompany, PageController } from "../components";
 
 import {
   useGetAllCompaniesMutation,
@@ -119,7 +119,7 @@ const Companies = () => {
       )}
       {displayCompanies &&
         companies?.map((data) => <CompanyPreview companyData={data} />)}
-      <CreateCompany isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+      <EditCompany isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       {companies?.length ? (
         <PageController paginationInfo={paginationInfo} setPage={setPage} />
       ) : (

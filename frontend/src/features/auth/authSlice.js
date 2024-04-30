@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+//TODO: Use Redux persist
+
 const initialState = {
   user: null,
   token: sessionStorage.getItem("token"),

@@ -13,6 +13,11 @@ const updateCompany = async (req, res) => {
   return res.status(HttpStatus.OK).json({ data });
 };
 
+const getCompany = async (req, res) => {
+  const data = await companyService.getCompany(req.params.id);
+  return res.status(HttpStatus.OK).json({ data });
+};
+
 const uploadLogo = async (req, res) => {
   const url = await companyService.uploadLogo(req.params.id, req.file);
   return res.status(HttpStatus.OK).json({ url });
@@ -40,6 +45,12 @@ const getAll = async (req, res) => {
   return res.status(HttpStatus.OK).json({ data });
 };
 
+const getCompanyEvents = async (req, res) => {
+  const pagination = parsePagination(req);
+  const data = await companyService.getCompanyEvents(pagination, req.params.id);
+  return res.status(HttpStatus.OK).json({ data });
+};
+
 const getFollowedCompanies = async (req, res) => {
   const pagination = parsePagination(req);
   const data = await companyService.getFollowedCompanies(
@@ -60,11 +71,13 @@ const toggleFollowStatus = async (req, res) => {
 module.exports = {
   createCompany,
   updateCompany,
+  getCompany,
   uploadLogo,
   connectToStripe,
   getStripeAccount,
   getMyCompanies,
   getAll,
+  getCompanyEvents,
   getFollowedCompanies,
   toggleFollowStatus,
 };

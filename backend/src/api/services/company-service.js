@@ -1,5 +1,6 @@
 const HttpStatus = require("http-status-codes").StatusCodes;
 const logger = require("../../config/logger");
+const eventService = require("../services/event-service");
 const paymentService = require("./payment-service");
 const s3Service = require("./s3-service");
 
@@ -70,6 +71,10 @@ const updateCompany = async (companyData, companyId) => {
   });
 };
 
+const getCompany = async (companyId) => {
+  return await Company.findById(companyId).select("-stripeId");
+};
+
 const uploadLogo = async (companyId, file) => {
   const company = await Company.findById(companyId);
   const oldLogo = company.logo;
@@ -127,13 +132,9 @@ const getUserCompanies = async (pagination, userId) => {
     null,
     "-stripeId"
   );
-  //return await Company.find({ owner: userId }).select("-stripeId");
 };
 
 const getFollowedCompanies = async (pagination, userId) => {
-  // return await Company.find({ followers: { $in: [userId] } }).select(
-  //   "-stripeId"
-  // );
   return await paginate(
     Company,
     pagination,
@@ -145,6 +146,10 @@ const getFollowedCompanies = async (pagination, userId) => {
 
 const getAll = async (pagination) => {
   return await paginate(Company, pagination, null, null, "-stripeId");
+};
+
+const getCompanyEvents = async (pagination, companyId) => {
+  return await eventService.getEvents(pagination, { company: companyId });
 };
 
 const toggleFollowStatus = async (userId, companyId) => {
@@ -175,11 +180,13 @@ const toggleFollowStatus = async (userId, companyId) => {
 module.exports = {
   createCompany,
   updateCompany,
+  getCompany,
   uploadLogo,
   connectToStripe,
   getStripeAccount,
   getUserCompanies,
   getFollowedCompanies,
   getAll,
+  getCompanyEvents,
   toggleFollowStatus,
 };

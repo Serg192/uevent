@@ -7,6 +7,7 @@ const { catchAsyncErr } = require("../middlewares/error-boundary");
 const {
   companyGuard,
   followCompanyGuard,
+  companyIdCheck,
 } = require("../middlewares/company-guard-mid");
 const companyController = require("../controllers/company-controller");
 const eventController = require("../controllers/event-controller");
@@ -28,6 +29,9 @@ router.patch(
   validate(cSchema.UpdateCompany),
   catchAsyncErr(companyController.updateCompany)
 );
+
+router.get("/my", jwtAuth, catchAsyncErr(companyController.getMyCompanies));
+router.get("/:id", companyIdCheck, catchAsyncErr(companyController.getCompany));
 
 router.post(
   "/:id/logo",
@@ -53,7 +57,7 @@ router.get(
 );
 
 ///////////////////
-router.get("/my", jwtAuth, catchAsyncErr(companyController.getMyCompanies));
+
 router.get(
   "/followed",
   jwtAuth,
@@ -73,6 +77,12 @@ router.post(
   companyGuard,
   validate(eSchema.CreateEvent),
   catchAsyncErr(eventController.createEvent)
+);
+
+router.get(
+  "/:id/events",
+  companyGuard,
+  catchAsyncErr(companyController.getCompanyEvents)
 );
 
 //PUBLIC

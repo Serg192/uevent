@@ -59,8 +59,8 @@ app.use((err, req, res, next) => {
 
 module.exports = https.createServer(
   {
-    key: fs.readFileSync(path.join(__dirname, "../../cert", "key.pem")),
-    cert: fs.readFileSync(path.join(__dirname, "../../cert", "cert.pem")),
+    key: fs.readFileSync(path.join(__dirname, "../../cert", "ueventCert.key")),
+    cert: fs.readFileSync(path.join(__dirname, "../../cert", "ueventCert.crt")),
   },
   app
 );
