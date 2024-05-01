@@ -9,6 +9,7 @@ const CreateEvent = Joi.object({
   ticketsAvailable: Joi.number().positive().required(),
   lat: Joi.number().required().min(LAT.min).max(LAT.max),
   long: Joi.number().required().min(LONG.min).max(LONG.max),
+  address: Joi.string().required(),
   format: Joi.string()
     .required()
     .valid(...FORMATS),
@@ -26,6 +27,7 @@ const UpdateEvent = Joi.object({
   ticketsAvailable: Joi.number().positive(),
   lat: Joi.number().min(LAT.min).max(LAT.max),
   long: Joi.number().min(LONG.min).max(LONG.max),
+  address: Joi.string(),
   format: Joi.string().valid(...FORMATS),
   themes: Joi.array()
     .items(Joi.string().valid(...THEMES))

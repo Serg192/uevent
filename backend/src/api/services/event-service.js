@@ -46,21 +46,31 @@ const updateEvent = async (eventData, eventId) => {
 };
 
 const getEvent = async (eventId, userId) => {
+  console.log("Get event", eventId, userId);
   const event = await Event.findById(eventId).populate({
     path: "company",
     select: "-stripeId",
   });
 
-  let subscribed = false;
+  let subscribed = false,
+    visibleToPublic = false;
   if (userId && mongoose.Types.ObjectId.isValid(userId)) {
-    const sub = await EventSubscriptionModel.countDocuments({
+    const sub = await EventSubscriptionModel.findOne({
       event: eventId,
       user: userId,
     });
-    if (sub) subscribed = true;
+    if (sub) {
+      subscribed = true;
+      visibleToPublic = sub.visibleToPublic;
+    }
   }
 
-  return { event, subscribed };
+  const response = { event, subscribed };
+  if (subscribed) {
+    response.visibleToPublic = visibleToPublic;
+  }
+
+  return response;
 };
 
 const getSubscribedUsers = async (eventId, paginationOpt) => {

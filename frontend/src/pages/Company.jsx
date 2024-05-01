@@ -83,7 +83,9 @@ const Company = () => {
 
   const loadCompanyData = async () => {
     try {
-      const response = await getCompany({ id: cid }).unwrap();
+      const response = await getCompany({
+        id: cid,
+      }).unwrap();
       setCompanyData(response.data);
       setIsOwner(response.data.owner === userData?.user._id);
       setFollower(response.data.followers.includes(userData?.user._id));

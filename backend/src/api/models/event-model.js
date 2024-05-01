@@ -36,6 +36,9 @@ const EventModel = new Schema(
         required: true,
       },
     },
+    address: {
+      type: String,
+    },
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "companies",

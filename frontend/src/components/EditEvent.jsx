@@ -10,6 +10,7 @@ import {
   Select,
   MenuItem,
   Divider,
+  Avatar,
 } from "@mui/material";
 import * as dayjs from "dayjs";
 
@@ -20,8 +21,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 
 import { useCreateEventMutation } from "../features/company/companyApiSlice";
+import {
+  useUpdateEventMutation,
+  useUploadBannerMutation,
+} from "../features/event/eventApiSlice";
 
-const EditEvent = ({ isOpen, setIsOpen, companyId }) => {
+const EditEvent = ({ isOpen, setIsOpen, companyId, initData, initAddress }) => {
   const format = ["conference", "lecture", "workshop", "fest"];
   const themes = ["business", "politics", "psychology", "IT"];
 
@@ -38,11 +43,15 @@ const EditEvent = ({ isOpen, setIsOpen, companyId }) => {
   const [descriptionError, setDescriptionError] = useState(false);
   const [priceError, setPriceError] = useState(false);
   const [ticketsError, setTicketsError] = useState(false);
+  const [banner, setBanner] = useState();
+  const [file, setFile] = useState();
 
   const [searchResult, setSearchResult] = useState("");
   const [placeSelected, setPlaceSelected] = useState(false);
 
   const [createEvent] = useCreateEventMutation();
+  const [updateEvent] = useUpdateEventMutation();
+  const [uploadBanner] = useUploadBannerMutation();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -50,9 +59,24 @@ const EditEvent = ({ isOpen, setIsOpen, companyId }) => {
   });
 
   useEffect(() => {
-    setDate(new Date());
-    setSelectedFormat(format[0]);
-    setSelectedTheme(themes[0]);
+    if (initData) {
+      setAddress(initAddress);
+      setName(initData.name);
+      setDescription(initData.description);
+      setDate(new Date(initData.date));
+      setIsFree(initData.price === 0);
+      setTickets(initData.ticketsAvailable);
+      setSelectedFormat(initData.format);
+      setSelectedTheme(initData.themes[0]);
+    } else {
+      setDate(new Date());
+      setSelectedFormat(format[0]);
+      setSelectedTheme(themes[0]);
+    }
+    setBanner(
+      initData?.eventPicture ||
+        "https://data.micepad.co/data/contents/6176/micepad-default-banner-new.jpg"
+    );
   }, [isOpen]);
 
   function onPlaceChanged() {
@@ -64,6 +88,22 @@ const EditEvent = ({ isOpen, setIsOpen, companyId }) => {
       setPlaceSelected(false);
     }
   }
+  const handleUploadImage = async () => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+      try {
+        console.log(formData);
+        const data = await uploadBanner({
+          id: initData._id,
+          formData,
+        }).unwrap();
+        setBanner(data.url);
+      } catch (err) {
+        console.error("Error uploading photo:", err);
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     setNameError(false);
@@ -84,22 +124,41 @@ const EditEvent = ({ isOpen, setIsOpen, companyId }) => {
       const place = searchResult.getPlace();
       const lat = place?.geometry.location.lat();
       const long = place?.geometry.location.lng();
-      console.log("COMPANY ID: ", companyId);
+
       try {
-        await createEvent({
-          id: companyId,
-          data: {
-            name,
-            description,
-            date,
-            price: isFree ? 0 : price,
-            ticketsAvailable: tickets,
-            lat,
-            long,
-            format: selectedFormat,
-            themes: [selectedTheme],
-          },
-        }).unwrap();
+        if (initData) {
+          await updateEvent({
+            id: initData._id,
+            data: {
+              name,
+              description,
+              date,
+              price: isFree ? 0 : price,
+              ticketsAvailable: tickets,
+              lat: lat || initData.location.coordinates[0],
+              long: long || initData.location.coordinates[1],
+              format: selectedFormat,
+              themes: [selectedTheme],
+              address,
+            },
+          }).unwrap();
+        } else {
+          await createEvent({
+            id: companyId,
+            data: {
+              name,
+              description,
+              date,
+              price: isFree ? 0 : price,
+              ticketsAvailable: tickets,
+              lat,
+              long,
+              format: selectedFormat,
+              themes: [selectedTheme],
+              address,
+            },
+          }).unwrap();
+        }
         handleCloseModal();
       } catch (err) {
         console.log(err);
@@ -127,14 +186,63 @@ const EditEvent = ({ isOpen, setIsOpen, companyId }) => {
           transform: "translate(-50%, -50%)",
           bgcolor: "background.paper",
           boxShadow: 24,
+          maxHeight: "100vh",
+          overflowY: "auto",
           p: 4,
           minWidth: "700px",
           overflow: "auto",
         }}
       >
         <Typography variant="h3" align="center">
-          Create event
+          {initData ? "Edit event" : "Create event"}
         </Typography>
+
+        {initData && (
+          <>
+            <Stack
+              direction="row"
+              mt={2}
+              mb={2}
+              spacing={2}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Box
+                component="img"
+                sx={{
+                  height: 75,
+                  width: 100,
+                }}
+                alt="The house from the offer."
+                src={banner}
+              />
+
+              <Stack direction="column">
+                <input
+                  type="file"
+                  inputProps={{ accept: "image/*" }}
+                  onChange={(e) => {
+                    setFile(e.target.files[0]);
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component="span"
+                  sx={{ mt: 2 }}
+                  onClick={() => handleUploadImage()}
+                >
+                  Upload
+                </Button>
+              </Stack>
+            </Stack>
+            <Divider
+              orientation="horizontal"
+              sx={{ mt: 1, mb: 1, backgroundColor: "gray" }}
+              flexItem
+            />
+          </>
+        )}
 
         <Stack direction="row" spacing={3} justifyContent="space-between">
           <Stack direction="column" width="50%" spacing={3}>

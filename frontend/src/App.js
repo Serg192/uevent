@@ -8,6 +8,7 @@ import {
   Events,
   Companies,
   Company,
+  Event,
 } from "./pages";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -21,6 +22,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Events />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/events/:eid" element={<Event />} />
         <Route path="/companies" element={<Companies />} />
         <Route path="/companies/:cid" element={<Company />} />
         <Route path="/login" element={<Login />} />
