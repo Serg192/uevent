@@ -8,3 +8,4 @@ export { default as EditCompany } from "./EditCompany";
 export { default as CompanyPreview } from "./CompanyPreview";
 export { default as PageController } from "./PageController";
 export { default as StripeMenu } from "./StripeMenu";
+export { default as EventPreview } from "./EventPreview";
