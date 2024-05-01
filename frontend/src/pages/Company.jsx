@@ -7,6 +7,7 @@ import {
   Avatar,
   useMediaQuery,
   Button,
+  Divider,
 } from "@mui/material";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,13 +16,21 @@ import { selectCurrentUser } from "../features/auth/authSlice";
 import {
   useGetCompanyMutation,
   useFollowCompanyMutation,
+  useGetCompanyEventsMutation,
 } from "../features/company/companyApiSlice";
 
 import { setKey, fromLatLng, setLocationType } from "react-geocode";
 
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import PaymentIcon from "@mui/icons-material/Payment";
-import { EditCompany, StripeMenu } from "../components";
+import {
+  EditCompany,
+  StripeMenu,
+  EditEvent,
+  PageController,
+  EventSimplifiedPreview,
+} from "../components";
 
 setKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
 setLocationType("ROOFTOP");
@@ -39,6 +48,11 @@ const Company = () => {
   const [follower, setFollower] = useState(false);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
+  const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
+  const [events, setEvents] = useState(null);
+
+  const [paginationInfo, setPaginationInfo] = useState({});
+  const [page, setPage] = useState(1);
   const userData = useSelector(selectCurrentUser);
 
   const { isLoaded } = useLoadScript({
@@ -47,6 +61,25 @@ const Company = () => {
 
   const [getCompany] = useGetCompanyMutation();
   const [follow] = useFollowCompanyMutation();
+  const [getEvents] = useGetCompanyEventsMutation();
+
+  const loadCompanyEvents = async () => {
+    try {
+      const response = await getEvents({
+        id: cid,
+        page,
+        pageSize: 5,
+      }).unwrap();
+      setEvents(response.data.data);
+      setPaginationInfo({
+        currentPage: response.data.currentPage,
+        pageSize: response.data.pageSize,
+        total: response.data.total,
+      });
+    } catch (err) {
+      console.log();
+    }
+  };
 
   const loadCompanyData = async () => {
     try {
@@ -54,10 +87,16 @@ const Company = () => {
       setCompanyData(response.data);
       setIsOwner(response.data.owner === userData?.user._id);
       setFollower(response.data.followers.includes(userData?.user._id));
+
+      await loadCompanyEvents();
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    loadCompanyEvents();
+  }, [isEditEventModalOpen, page]);
 
   useEffect(() => {
     loadCompanyData();
@@ -202,16 +241,43 @@ const Company = () => {
           )}
         </Box>
         <Paper sx={{ p: 2, mt: 2, width: isLargeScreen ? "50%" : "100%" }}>
-          <Typography variant="h5">Events</Typography>
-          {/* {events.map((event) => (
-            <Box
-              key={event.id}
-              sx={{ borderBottom: "1px solid #ccc", pb: 1, mb: 1 }}
-            >
-              <Typography variant="subtitle1">{event.title}</Typography>
-              <Typography variant="body2">{event.date}</Typography>
-            </Box>
-          ))} */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography variant="h5">Events</Typography>
+            {isOwner && (
+              <Button
+                variant="contained"
+                color="info"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setIsEditEventModalOpen(true);
+                }}
+              >
+                Create
+              </Button>
+            )}
+          </Stack>
+          <Divider
+            orientation="horizontal"
+            sx={{ mt: 1, backgroundColor: "gray" }}
+            flexItem
+          />
+          <Stack direction="column" alignItems="center" width="100%">
+            {events?.map((e) => (
+              <EventSimplifiedPreview event={e} />
+            ))}
+            {events?.length ? (
+              <PageController
+                paginationInfo={paginationInfo}
+                setPage={setPage}
+              />
+            ) : (
+              <></>
+            )}
+          </Stack>
         </Paper>
       </Stack>
       <EditCompany
@@ -223,6 +289,11 @@ const Company = () => {
       <StripeMenu
         isOpen={isStripeModalOpen}
         setIsOpen={setIsStripeModalOpen}
+        companyId={companyData?._id}
+      />
+      <EditEvent
+        isOpen={isEditEventModalOpen}
+        setIsOpen={setIsEditEventModalOpen}
         companyId={companyData?._id}
       />
     </Box>

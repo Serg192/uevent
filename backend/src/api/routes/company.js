@@ -81,7 +81,7 @@ router.post(
 
 router.get(
   "/:id/events",
-  companyGuard,
+  companyIdCheck,
   catchAsyncErr(companyController.getCompanyEvents)
 );
 

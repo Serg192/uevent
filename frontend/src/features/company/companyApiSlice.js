@@ -67,6 +67,20 @@ export const companyApiSlice = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
+    createEvent: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/companies/${id}/event`,
+        method: "POST",
+        body: { ...data },
+      }),
+    }),
+
+    getCompanyEvents: builder.mutation({
+      query: ({ id, page, pageSize }) => ({
+        url: `/companies/${id}/events?page=${page}&pageSize=${pageSize}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -81,4 +95,6 @@ export const {
   useSetupStripeAccountMutation,
   useGetStripeDashboardMutation,
   useFollowCompanyMutation,
+  useCreateEventMutation,
+  useGetCompanyEventsMutation,
 } = companyApiSlice;
