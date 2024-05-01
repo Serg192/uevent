@@ -10,3 +10,4 @@ export { default as PageController } from "./PageController";
 export { default as StripeMenu } from "./StripeMenu";
 export { default as EditEvent } from "./EditEvent";
 export { default as EventSimplifiedPreview } from "./EventSimplifiedPreview";
+export { default as EventPreview } from "./EventPreview";
