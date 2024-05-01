@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 import {
   useGetEventMutation,
   useGetSubscribedToEventUsersMutation,
+  useToggleVisibleToPublicMutation,
 } from "../features/event/eventApiSlice";
 import { selectCurrentUser } from "../features/auth/authSlice";
 import {
@@ -18,14 +19,19 @@ import {
   Typography,
 } from "@mui/material";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
-import { setKey, fromLatLng, setLocationType } from "react-geocode";
 import EditIcon from "@mui/icons-material/Edit";
 
-import { EditEvent } from "../components";
+import {
+  EditEvent,
+  Subscribe,
+  PageController,
+  EventUserPreview,
+} from "../components";
 
 const Event = () => {
   const { eid } = useParams();
   const isLargeScreen = useMediaQuery("(min-width:850px)");
+  const navigate = useNavigate();
 
   const [eventData, setEventData] = useState(null);
   const [subscribedUsers, setSubscribedUsers] = useState(null);
@@ -33,12 +39,20 @@ const Event = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [visibleToPublic, setVisibleToPublic] = useState(false);
 
-  const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
+  const [paginationInfo, setPaginationInfo] = useState({});
+  const [page, setPage] = useState(1);
 
+  const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
+  const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
   const userData = useSelector(selectCurrentUser);
 
   const [getEvent] = useGetEventMutation();
   const [getUsers] = useGetSubscribedToEventUsersMutation();
+  const [toggleVisibility] = useToggleVisibleToPublicMutation();
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+  });
 
   const createChip = (text) => {
     return (
@@ -57,8 +71,14 @@ const Event = () => {
 
   const loadUsers = async () => {
     try {
-      const response = await getUsers({ id: eid }).unwrap();
-      console.log("Loaded users", response);
+      const response = await getUsers({ id: eid, page, pageSize: 10 }).unwrap();
+      setSubscribedUsers(response.data.data);
+      setPaginationInfo({
+        currentPage: response.data.currentPage,
+        pageSize: response.data.pageSize,
+        total: response.data.total,
+      });
+      console.log("Get users", response.data.data);
     } catch (err) {
       console.log(err);
     }
@@ -71,13 +91,36 @@ const Event = () => {
         ...(userData && { uid: userData.user._id }),
       }).unwrap();
       setEventData(response.data.event);
-      setIsOwner(response.data.event.company.owner === userData?.user._id);
-      setSubscribed(response.subscribed);
-      if (response.subscribed) {
-        setVisibleToPublic(response.visibleToPublic);
+      setIsOwner(
+        userData
+          ? response.data.event.company.owner === userData?.user._id
+          : false
+      );
+      setSubscribed(response.data.subscribed);
+
+      console.log("load event data", response);
+      if (response.data.subscribed) {
+        setVisibleToPublic(response.data.visibleToPublic);
       }
-      console.log("Event loaded", response);
+
       await loadUsers();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleClickSubscribe = async () => {
+    if (!userData) {
+      navigate("/login");
+    } else {
+      setIsSubscribeModalOpen(true);
+    }
+  };
+
+  const handleVisibilityChange = async () => {
+    try {
+      await toggleVisibility({ id: eid }).unwrap();
+      await loadEventData();
     } catch (err) {
       console.log(err);
     }
@@ -85,7 +128,7 @@ const Event = () => {
 
   useEffect(() => {
     loadEventData();
-  }, [eid, userData, isEditEventModalOpen]);
+  }, [eid, userData, isEditEventModalOpen, isSubscribeModalOpen, page]);
 
   return (
     <Box>
@@ -143,8 +186,14 @@ const Event = () => {
           </GoogleMap>
         </Stack>
         <Stack direction="column" width={isLargeScreen ? "50%" : "100%"}>
-          {isOwner && (
-            <Stack direction="row" pt={2} mr={2} justifyContent="flex-end">
+          <Stack
+            direction="row"
+            spacing={2}
+            pt={2}
+            mr={2}
+            justifyContent="flex-end"
+          >
+            {isOwner && (
               <Button
                 variant="contained"
                 startIcon={<EditIcon />}
@@ -152,10 +201,45 @@ const Event = () => {
               >
                 Edit
               </Button>
-            </Stack>
-          )}
+            )}
+            {!isOwner && subscribed && (
+              <Button
+                variant="contained"
+                onClick={() => handleVisibilityChange()}
+              >
+                {visibleToPublic ? "Don't show in list" : "Show in list"}
+              </Button>
+            )}
+            {!isOwner && (
+              <Button
+                disabled={subscribed}
+                variant="contained"
+                onClick={() => {
+                  if (!subscribed) handleClickSubscribe();
+                }}
+              >
+                {subscribed ? "Subscribed" : "Subscribe"}
+              </Button>
+            )}
+          </Stack>
+
           <Paper sx={{ width: "100%", p: 2, mt: 6 }}>
-            <Typography variant="h3" pl={2}>
+            <Stack direction="row" pl={2} justifyContent="space-between">
+              <Typography variant="h4">
+                Price:
+                {eventData?.price === 0 ? "Free" : eventData?.price + "$"}
+              </Typography>
+              <Typography variant="h4" mr={1}>
+                Tickets:
+                {eventData?.ticketsAvailable}
+              </Typography>
+            </Stack>
+            <Divider
+              orientation="horizontal"
+              sx={{ mt: 1, backgroundColor: "gray" }}
+              flexItem
+            />
+            <Typography variant="h3" pl={2} mt={1}>
               Description
             </Typography>
             <Typography variant="h4" pl={2} mt={1}>
@@ -170,6 +254,19 @@ const Event = () => {
               sx={{ mt: 1, backgroundColor: "gray" }}
               flexItem
             />
+            <Stack direction="column" alignItems="center">
+              {subscribedUsers?.map((uData) => (
+                <EventUserPreview user={uData.user} />
+              ))}
+              {subscribedUsers?.length ? (
+                <PageController
+                  paginationInfo={paginationInfo}
+                  setPage={setPage}
+                />
+              ) : (
+                <></>
+              )}
+            </Stack>
           </Paper>
         </Stack>
       </Stack>
@@ -179,6 +276,11 @@ const Event = () => {
         companyId={eventData?.company._id}
         initData={eventData}
         initAddress={eventData?.address}
+      />
+      <Subscribe
+        isOpen={isSubscribeModalOpen}
+        setIsOpen={setIsSubscribeModalOpen}
+        eventId={eid}
       />
     </Box>
   );

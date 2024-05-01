@@ -23,8 +23,8 @@ export const eventApiSlice = apiSlice.injectEndpoints({
     }),
 
     getSubscribedToEventUsers: builder.mutation({
-      query: ({ id }) => ({
-        url: `/events/${id}/subscribed-users`,
+      query: ({ id, page, pageSize }) => ({
+        url: `/events/${id}/subscribed-users?page=${page}&pageSize=${pageSize}`,
         method: "GET",
       }),
     }),
@@ -42,6 +42,21 @@ export const eventApiSlice = apiSlice.injectEndpoints({
         url: `/events/${id}/poster`,
         method: "POST",
         body: formData,
+      }),
+    }),
+
+    subscribe: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/events/${id}/subscribe`,
+        method: "POST",
+        body: { ...data },
+      }),
+    }),
+
+    toggleVisibleToPublic: builder.mutation({
+      query: ({ id }) => ({
+        url: `/events/${id}/toggle-user-visibility`,
+        method: "POST",
       }),
     }),
     // getMyEvents: builder.mutation({
@@ -66,4 +81,6 @@ export const {
   useGetSubscribedToEventUsersMutation,
   useUpdateEventMutation,
   useUploadBannerMutation,
+  useSubscribeMutation,
+  useToggleVisibleToPublicMutation,
 } = eventApiSlice;
