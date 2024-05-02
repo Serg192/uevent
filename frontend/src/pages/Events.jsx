@@ -3,7 +3,7 @@ import { Stack, Typography, Select, MenuItem } from "@mui/material";
 
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../features/auth/authSlice";
-import { EventPreview, PageController } from "../components";
+import { EventPreview, PageController, SearchBar } from "../components";
 
 import {
   useGetAllEventsMutation,
@@ -16,6 +16,8 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
+
+  const [searchPattern, setSearchPattern] = useState();
 
   const userData = useSelector(selectCurrentUser);
 
@@ -35,7 +37,11 @@ const Events = () => {
       let response = null;
       switch (selectedOption) {
         case "All":
-          response = await getAll({ page, pageSize: 10 }).unwrap();
+          response = await getAll({
+            page,
+            pageSize: 10,
+            ...(searchPattern?.length && { search: searchPattern }),
+          }).unwrap();
           setEvents(response.result.data);
           break;
         case "Subscribed":
@@ -89,6 +95,7 @@ const Events = () => {
             </MenuItem>
           ))}
         </Select>
+        <SearchBar setPattern={setSearchPattern} callback={loadEvents} />
       </Stack>
       {selectedOption !== "All" && !userData && (
         <Typography variant="h4">You should log in to see this data</Typography>

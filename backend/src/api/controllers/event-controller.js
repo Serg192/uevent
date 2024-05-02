@@ -24,7 +24,7 @@ const uploadPicture = async (req, res) => {
 };
 
 const getEvents = async (req, res) => {
-  let { order, format, themes } = req.query;
+  let { order, format, themes, search } = req.query;
 
   const pagination = parsePagination(req);
   pagination.sort = { date: order === "ASC" ? 1 : -1 };
@@ -34,6 +34,7 @@ const getEvents = async (req, res) => {
   const filter = {
     ...(FORMATS.includes(format) && { format }),
     ...(themes?.length && { themes: { $all: themes } }),
+    ...(search && { name: { $regex: new RegExp(`^${search}`, "i") } }),
   };
 
   const result = await eventService.getEvents(pagination, filter);

@@ -87,10 +87,6 @@ const Companies = () => {
     else setIsModalOpen(true);
   };
 
-  const handleSearch = () => {
-    loadCompanies();
-  };
-
   return (
     <Stack
       direction="column"
@@ -120,7 +116,7 @@ const Companies = () => {
             </MenuItem>
           ))}
         </Select>
-        <SearchBar setPattern={setSearchPattern} callback={handleSearch} />
+        <SearchBar setPattern={setSearchPattern} callback={loadCompanies} />
         <Button
           variant="contained"
           onClick={handleCreate}
