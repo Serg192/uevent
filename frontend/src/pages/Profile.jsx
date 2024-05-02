@@ -14,43 +14,63 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentUser, setUser } from "../features/auth/authSlice";
 
 import { useGetSubscribedEventsMutation } from "../features/event/eventApiSlice";
-
 import { useGetMeMutation, useUploadAvatarMutation } from "../features/user/userApiSlice";
-
-import { PageController, EventSimplifiedPreview } from "../components";
+import { useGetMyCompaniesMutation } from "../features/company/companyApiSlice";
+import { PageController, EventPreview, CompanyPreview } from "../components";
 
 const Profile = () => {
   const dispatch = useDispatch();
   const userData = useSelector(selectCurrentUser);
-  const isAdmin = userData?.user?.role === "admin";
   const isLargeScreen = useMediaQuery("(min-width:850px)");
 
-  const [events, setEvents] = useState(null);
-  // const [getEvents] = useGetCompanyEventsMutation();
+  const [subEvents, setSubEvents] = useState(null);  
+  const [myCompanies, setMyCompanies] = useState(null);
+
   const [page, setPage] = useState(1);
-  const [paginationInfo, setPaginationInfo] = useState({});
+  const [paginationCompInfo, setPaginationCompInfo] = useState({});
+  const [paginationEventsInfo, setPaginationEventsInfo] = useState({});
   const [file, setFile] = useState();
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState(null);
-
-  const [getSubscribed] = useGetSubscribedEventsMutation();
+  
   const [uploadAvatar] = useUploadAvatarMutation();
   const [getMe] = useGetMeMutation();
+  const [getSubEvents] = useGetSubscribedEventsMutation();
+  const [getMyCompanies] = useGetMyCompaniesMutation();
 
-  const loadSubscribedEvents = async () => {
-    console.log("start");
+  const loadMyCompanies = async () => {
     setPage(1);
-    setEvents([]);
+    setMyCompanies([]);
+
     try {
       let response = null;
-      response = await getSubscribed({ page, pageSize: 10 }).unwrap();
-      console.log(response.result.data);
-      setEvents(response.result.data);
-
-      console.log(events);
+      response = await getMyCompanies({ page, pageSize: 10 }).unwrap();
+      setMyCompanies(response.data.data);
 
       if (response) {
-        setPaginationInfo({
+        setPaginationCompInfo({
+          currentPage: response.data.currentPage,
+          pageSize: response.data.pageSize,
+          total: response.data.total,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+  };
+
+  const loadSubscribedEvents = async () => {
+    setPage(1);
+    setSubEvents([]);
+
+    try {
+      let response = null;
+      response = await getSubEvents({ page, pageSize: 10 }).unwrap();
+      setSubEvents(response.result.data.map((d) => d.event));
+
+      if (response) {
+        setPaginationEventsInfo({
           currentPage: response.result.currentPage,
           pageSize: response.result.pageSize,
           total: response.result.total,
@@ -84,7 +104,9 @@ const Profile = () => {
       setName(userData.user?.username);
       setAvatar(userData.user?.profilePicture);
     }
-    // loadSubscribedEvents();
+
+    loadMyCompanies();
+    loadSubscribedEvents();
   }, [userData]);
 
   return (
@@ -145,26 +167,26 @@ const Profile = () => {
             alignItems="center"
             justifyContent="space-between"
           >
-            <Typography variant="h5">My Events</Typography>
+            <Typography variant="h5">My own Companies</Typography>
           </Stack>
           <Divider
             orientation="horizontal"
-            sx={{ mt: 1, backgroundColor: "gray" }}
+            sx={{ m: 1, backgroundColor: "gray" }}
             flexItem
           />
-          {/* <Stack direction="column" alignItems="center" width="100%">
-            {events?.map((e) => (
-              <EventSimplifiedPreview event={e} />
+          <Stack direction="column" alignItems="center" width="100%">
+            {myCompanies?.map((data) => (
+              <CompanyPreview key={data._id} companyData={data} />
             ))}
-            {events?.length ? (
+            {myCompanies?.length ? (
               <PageController
-                paginationInfo={paginationInfo}
+                paginationInfo={paginationCompInfo}
                 setPage={setPage}
               />
             ) : (
               <></>
             )}
-          </Stack> */}
+          </Stack>
         </Paper>
         <Paper sx={{ p: 2, m: 2, width: isLargeScreen ? "50%" : "100%" }}>
           <Stack
@@ -176,22 +198,22 @@ const Profile = () => {
           </Stack>
           <Divider
             orientation="horizontal"
-            sx={{ mt: 1, backgroundColor: "gray" }}
+            sx={{ m: 1, backgroundColor: "gray" }}
             flexItem
           />
-          {/* <Stack direction="column" alignItems="center" width="100%">
-            {events?.map((e) => (
-              <EventSimplifiedPreview event={e} />
+          <Stack direction="column" alignItems="center" width="100%">
+            {subEvents?.map((data) => (
+              <EventPreview key={data._id} eventData={data} />
             ))}
-            {events?.length ? (
+            {subEvents?.length ? (
               <PageController
-                paginationInfo={paginationInfo}
+                paginationInfo={paginationEventsInfo}
                 setPage={setPage}
               />
             ) : (
               <></>
             )}
-          </Stack> */}
+          </Stack>
         </Paper>
       </Stack>
     </Box>

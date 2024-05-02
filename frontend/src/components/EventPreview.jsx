@@ -12,7 +12,7 @@ const EventPreview = ({ eventData }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "start",
-        width: "60%",
+        width: { md: "60%", sm: "100%" },
 
         "&:hover": {
           transform: "scale(1.01)",

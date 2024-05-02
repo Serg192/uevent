@@ -11,7 +11,7 @@ const PageController = ({ paginationInfo, setPage }) => {
   pageSize = Number(pageSize);
 
   return (
-    <Stack direction="row" alignItems="center">
+    <Stack sx={{m:1}} direction="row" alignItems="center">
       <IconButton
         color={"primary.main"}
         onClick={() => {
