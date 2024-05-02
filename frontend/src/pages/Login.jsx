@@ -40,6 +40,7 @@ const Login = () => {
       navigate("/events");
     } catch (err) {
       console.log(err);
+      alert(err.data.message);
     }
   };
 
