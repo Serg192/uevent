@@ -6,6 +6,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { useNavigate } from "react-router-dom";
 
 import { Box } from "@mui/material";
+import { getRandomColor } from "../helpers/color-helper";
 
 const EventCalendar = ({ events }) => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const EventCalendar = ({ events }) => {
     id: event._id,
     title: event.name,
     start: event.date,
-    color: "#ff11ff",
+    color: getRandomColor(),
   }));
 
   const handleEventClick = (clickInfo) => {
