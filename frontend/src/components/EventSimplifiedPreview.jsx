@@ -33,7 +33,16 @@ const EventSimplifiedPreview = ({ event }) => {
         <Stack direction="row" justifyContent="space-between">
           <Stack direction="column">
             <Typography variant="h4">{event.name}</Typography>
-            <Typography variant="h6">Date: {event.date}</Typography>
+            <Typography variant="h6">
+              Date:{" "}
+              {new Date(event.date).toLocaleString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })}
+            </Typography>
             <Typography variant="body1">
               Location:{" "}
               {event.address.length > 40

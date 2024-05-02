@@ -8,6 +8,8 @@ import {
   useMediaQuery,
   Button,
   Divider,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -29,6 +31,7 @@ import {
   PageController,
   EventSimplifiedPreview,
 } from "../components";
+import { dateFilterOptions, getDatePeriod } from "../helpers/date-helper";
 
 const Company = () => {
   const { cid } = useParams();
@@ -45,6 +48,8 @@ const Company = () => {
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [events, setEvents] = useState(null);
+  const [selectedDateFilterOption, setSelectedDateFilterOption] =
+    useState("All");
 
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
@@ -59,11 +64,14 @@ const Company = () => {
   const [getEvents] = useGetCompanyEventsMutation();
 
   const loadCompanyEvents = async () => {
+    const period = getDatePeriod(selectedDateFilterOption);
+
     try {
       const response = await getEvents({
         id: cid,
         page,
         pageSize: 5,
+        ...(period && { startDate: period[0], endDate: period[1] }),
       }).unwrap();
       setEvents(response.data.data);
       setPaginationInfo({
@@ -93,7 +101,7 @@ const Company = () => {
 
   useEffect(() => {
     loadCompanyEvents();
-  }, [isEditEventModalOpen, page]);
+  }, [isEditEventModalOpen, page, selectedDateFilterOption]);
 
   useEffect(() => {
     loadCompanyData();
@@ -231,7 +239,24 @@ const Company = () => {
             alignItems="center"
             justifyContent="space-between"
           >
-            <Typography variant="h5">Events</Typography>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Typography variant="h5">Events</Typography>
+              <Select
+                value={selectedDateFilterOption}
+                onChange={(event) =>
+                  setSelectedDateFilterOption(event.target.value)
+                }
+                variant="outlined"
+                fullWidth
+              >
+                {dateFilterOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Stack>
+
             {isOwner && (
               <Button
                 variant="contained"

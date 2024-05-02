@@ -154,8 +154,11 @@ const getAll = async (pagination, search) => {
   return await paginate(Company, pagination, filter, null, "-stripeId");
 };
 
-const getCompanyEvents = async (pagination, companyId) => {
-  return await eventService.getEvents(pagination, { company: companyId });
+const getCompanyEvents = async (pagination, filter, companyId) => {
+  return await eventService.getEvents(pagination, {
+    company: companyId,
+    ...filter,
+  });
 };
 
 const toggleFollowStatus = async (userId, companyId) => {

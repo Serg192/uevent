@@ -78,8 +78,10 @@ export const companyApiSlice = apiSlice.injectEndpoints({
     }),
 
     getCompanyEvents: builder.mutation({
-      query: ({ id, page, pageSize }) => ({
-        url: `/companies/${id}/events?page=${page}&pageSize=${pageSize}`,
+      query: ({ id, page, pageSize, startDate, endDate }) => ({
+        url: `/companies/${id}/events?page=${page}&pageSize=${pageSize}${
+          startDate ? "&startDate=" + startDate : ""
+        }${endDate ? "&endDate=" + endDate : ""}`,
         method: "GET",
       }),
     }),

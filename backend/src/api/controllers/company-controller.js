@@ -1,6 +1,7 @@
 const HttpStatus = require("http-status-codes").StatusCodes;
 const logger = require("../../config/logger");
 const { parsePagination } = require("../helpers/pagination-helper");
+const { dateFilterRegex } = require("../../config/regex");
 const companyService = require("../services/company-service");
 
 const createCompany = async (req, res) => {
@@ -48,7 +49,23 @@ const getAll = async (req, res) => {
 
 const getCompanyEvents = async (req, res) => {
   const pagination = parsePagination(req);
-  const data = await companyService.getCompanyEvents(pagination, req.params.id);
+  const { startDate, endDate } = req.query;
+  const sDate = dateFilterRegex.test(startDate) && new Date(startDate);
+  const eDate = dateFilterRegex.test(endDate) && new Date(endDate);
+
+  let filter = {};
+  if (sDate || eDate) {
+    filter.date = {
+      ...(sDate && { $gte: sDate }),
+      ...(eDate && { $lte: new Date(eDate.setHours(23, 59, 59, 999)) }),
+    };
+  }
+
+  const data = await companyService.getCompanyEvents(
+    pagination,
+    filter,
+    req.params.id
+  );
   return res.status(HttpStatus.OK).json({ data });
 };
 

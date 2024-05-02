@@ -9,6 +9,7 @@ import {
   useGetAllEventsMutation,
   useGetSubscribedEventsMutation,
 } from "../features/event/eventApiSlice";
+import { getNextMonth, getNextWeek, getToday } from "../helpers/date-helper";
 
 const Events = () => {
   const options = ["All", "Subscribed"];
@@ -43,10 +44,12 @@ const Events = () => {
             ...(searchPattern?.length && { search: searchPattern }),
           }).unwrap();
           setEvents(response.result.data);
+          console.log(response.result.data);
           break;
         case "Subscribed":
           response = await getSubscribed({ page, pageSize: 10 }).unwrap();
-          setEvents(response.result.data);
+          setEvents(response.result.data.map((d) => d.event));
+
           break;
         default:
       }

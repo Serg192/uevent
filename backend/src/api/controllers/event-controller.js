@@ -1,5 +1,6 @@
 const HttpStatus = require("http-status-codes").StatusCodes;
 const { FORMATS, THEMES } = require("../../config/constants");
+const { dateFilterRegex } = require("../../config/regex");
 const { parsePagination } = require("../helpers/pagination-helper");
 const eventService = require("../services/event-service");
 
@@ -24,18 +25,28 @@ const uploadPicture = async (req, res) => {
 };
 
 const getEvents = async (req, res) => {
-  let { order, format, themes, search } = req.query;
+  let { order, format, themes, search, startDate, endDate } = req.query;
 
   const pagination = parsePagination(req);
   pagination.sort = { date: order === "ASC" ? 1 : -1 };
 
   themes = themes?.split(",")?.filter((th) => THEMES.includes(th));
 
-  const filter = {
+  const sDate = dateFilterRegex.test(startDate) && new Date(startDate);
+  const eDate = dateFilterRegex.test(endDate) && new Date(endDate);
+
+  let filter = {
     ...(FORMATS.includes(format) && { format }),
     ...(themes?.length && { themes: { $all: themes } }),
     ...(search && { name: { $regex: new RegExp(`^${search}`, "i") } }),
   };
+
+  if (sDate || eDate) {
+    filter.date = {
+      ...(sDate && { $gte: sDate }),
+      ...(eDate && { $lte: new Date(eDate.setHours(23, 59, 59, 999)) }),
+    };
+  }
 
   const result = await eventService.getEvents(pagination, filter);
 

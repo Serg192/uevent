@@ -9,4 +9,6 @@ Password requirements:
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*[!@#$&%^_+=()\\\[\]{};:<>.,|?\-\/*])(?=.*[0-9])(?=.*[a-z]).{10,}$/m;
 
-module.exports = { passwordRegex };
+const dateFilterRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+module.exports = { passwordRegex, dateFilterRegex };
