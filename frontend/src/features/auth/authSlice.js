@@ -1,10 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-//TODO: Use Redux persist
-
 const initialState = {
-  user: null,
-  token: sessionStorage.getItem("token"),
+  user: sessionStorage.getItem("user"),
+  token: null,
 };
 
 const authSlice = createSlice({
@@ -15,17 +13,17 @@ const authSlice = createSlice({
       const { accessToken } = action.payload;
 
       state.token = accessToken;
-      sessionStorage.setItem("token", accessToken);
     },
 
     setUser: (state, action) => {
       state.user = action.payload;
+      sessionStorage.setItem("user", action.payload);
     },
 
     logout: (state, action) => {
       state.user = null;
       state.token = null;
-      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
     },
   },
 });
