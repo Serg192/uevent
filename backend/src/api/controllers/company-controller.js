@@ -41,7 +41,8 @@ const getMyCompanies = async (req, res) => {
 
 const getAll = async (req, res) => {
   const pagination = parsePagination(req);
-  const data = await companyService.getAll(pagination);
+  const search = req.query.search;
+  const data = await companyService.getAll(pagination, search);
   return res.status(HttpStatus.OK).json({ data });
 };
 

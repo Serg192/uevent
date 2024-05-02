@@ -5,7 +5,12 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import { CompanyPreview, EditCompany, PageController } from "../components";
+import {
+  CompanyPreview,
+  EditCompany,
+  PageController,
+  SearchBar,
+} from "../components";
 
 import {
   useGetAllCompaniesMutation,
@@ -19,6 +24,8 @@ const Companies = () => {
   const [companies, setCompanies] = useState([]);
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
+
+  const [searchPattern, setSearchPattern] = useState();
 
   const navigate = useNavigate();
   const userData = useSelector(selectCurrentUser);
@@ -42,7 +49,11 @@ const Companies = () => {
       let response = null;
       switch (selectedOption) {
         case "All":
-          response = await getAll({ page, pageSize: 10 }).unwrap();
+          response = await getAll({
+            page,
+            pageSize: 10,
+            ...(searchPattern?.length && { search: searchPattern }),
+          }).unwrap();
           setCompanies(response.data.data);
           break;
         case "Followed":
@@ -76,6 +87,10 @@ const Companies = () => {
     else setIsModalOpen(true);
   };
 
+  const handleSearch = () => {
+    loadCompanies();
+  };
+
   return (
     <Stack
       direction="column"
@@ -89,7 +104,7 @@ const Companies = () => {
         direction="row"
         alignItems="center"
         spacing={2}
-        sx={{ width: "60%" }}
+        sx={{ width: { sx: "100%", md: "60%" } }}
       >
         <Typography variant="h2">Companies</Typography>
         <Select
@@ -105,6 +120,7 @@ const Companies = () => {
             </MenuItem>
           ))}
         </Select>
+        <SearchBar setPattern={setSearchPattern} callback={handleSearch} />
         <Button
           variant="contained"
           onClick={handleCreate}

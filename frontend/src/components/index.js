@@ -14,3 +14,4 @@ export { default as EventPreview } from "./EventPreview";
 export { default as Subscribe } from "./Subscribe";
 export { default as EventUserPreview } from "./EventUserPreview";
 export { default as PromoCodes } from "./PromoCodes";
+export { default as SearchBar } from "./SearchBar";

@@ -24,8 +24,10 @@ export const companyApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     getAllCompanies: builder.mutation({
-      query: ({ page, pageSize }) => ({
-        url: `/companies?page=${page}&pageSize=${pageSize}`,
+      query: ({ page, pageSize, search }) => ({
+        url: `/companies?page=${page}&pageSize=${pageSize}${
+          search ? "&search=" + search : ""
+        }`,
         method: "GET",
       }),
     }),

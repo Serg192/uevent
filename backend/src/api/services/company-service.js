@@ -145,8 +145,13 @@ const getFollowedCompanies = async (pagination, userId) => {
   );
 };
 
-const getAll = async (pagination) => {
-  return await paginate(Company, pagination, null, null, "-stripeId");
+const getAll = async (pagination, search) => {
+  let filter = null;
+  if (search) {
+    const regexPattern = new RegExp(`^${search}`, "i");
+    filter = { name: { $regex: regexPattern } };
+  }
+  return await paginate(Company, pagination, filter, null, "-stripeId");
 };
 
 const getCompanyEvents = async (pagination, companyId) => {
