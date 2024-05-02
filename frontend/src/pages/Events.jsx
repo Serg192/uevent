@@ -11,7 +11,6 @@ import {
 } from "../features/event/eventApiSlice";
 
 import { dateFilterOptions, getDatePeriod } from "../helpers/date-helper";
-import { getNextMonth, getNextWeek, getToday } from "../helpers/date-helper";
 
 const Events = () => {
   const options = ["All", "Subscribed"];
@@ -31,25 +30,33 @@ const Events = () => {
   const loadEvents = async () => {
     setPage(1);
     setEvents([]);
+
     if (
       selectedOption === "Subscribed" && !userData
     ) {
       return;
     }
+
     try {
       let response = null;
+      const period = getDatePeriod(selectedDateFilterOption);
+      
       switch (selectedOption) {
         case "All":
           response = await getAll({
             page,
             pageSize: 10,
             ...(searchPattern?.length && { search: searchPattern }),
+            ...(period && { startDate: period[0], endDate: period[1] }),
           }).unwrap();
+
           setEvents(response.result.data);
-          console.log(response.result.data);
           break;
         case "Subscribed":
-          response = await getSubscribed({ page, pageSize: 10 }).unwrap();
+          response = await getSubscribed({ 
+            page, 
+            pageSize: 10,
+          }).unwrap();
           setEvents(response.result.data.map((d) => d.event));
 
           break;
@@ -107,6 +114,7 @@ const Events = () => {
             }
             variant="outlined"
             fullWidth
+            disabled={selectedOption === "Subscribed"}
           >
             {dateFilterOptions.map((option) => (
               <MenuItem key={option} value={option}>

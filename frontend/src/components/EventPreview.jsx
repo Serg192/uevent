@@ -3,7 +3,6 @@ import { Typography, Box, Stack, Paper, Chip } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const EventPreview = ({ eventData }) => {
-  console.log(eventData)
   const { 
     _id, 
     name, 

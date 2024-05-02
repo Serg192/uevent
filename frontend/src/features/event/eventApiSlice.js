@@ -3,10 +3,8 @@ import { apiSlice } from "../../app/api/apiSlice";
 export const eventApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllEvents: builder.mutation({
-      query: ({ page, pageSize, search }) => ({
-        url: `/events?page=${page}&pageSize=${pageSize}${
-          search ? "&search=" + search : ""
-        }`,
+      query: ({ page, pageSize, search, startDate, endDate }) => ({
+        url: `/events?page=${page}&pageSize=${pageSize}${search ? "&search=" + search : ""}${startDate ? "&startDate=" + startDate : ""}${endDate ? "&endDate=" + endDate : ""}`,
         method: "GET",
       }),
     }),
