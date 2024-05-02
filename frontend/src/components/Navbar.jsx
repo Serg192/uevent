@@ -84,13 +84,15 @@ const Navbar = () => {
         <Stack direction="row" spacing={2}>
           {userData && (
             <>
-              <Stack direction="row" alignItems="center" spacing={1.5}>
-                <Avatar
-                  src={userData?.user?.profilePicture}
-                  sx={{ width: 32, height: 32 }}
-                />
-                <Typography variant="h5">{userData?.user?.username}</Typography>
-              </Stack>
+              <Link to={`/profile`}>
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Avatar
+                    src={userData?.user?.profilePicture}
+                    sx={{ width: 32, height: 32 }}
+                  />
+                  <Typography variant="h5" color="white">{userData?.user?.username}</Typography>
+                </Stack>
+              </Link>
 
               <Button
                 onClick={() => handleLogout()}
@@ -111,7 +113,7 @@ const Navbar = () => {
                 color="info"
                 variant="contained"
               >
-                signup
+                sign up
               </Button>
               <Button
                 onClick={() => {

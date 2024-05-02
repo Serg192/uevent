@@ -9,6 +9,7 @@ import {
   Companies,
   Company,
   Event,
+  Profile,
 } from "./pages";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -38,6 +39,7 @@ const App = () => (
         </Route>
 
         <Route path="/signup" element={<Signup />} />
+        <Route path="/profile" element={<Profile />}/>
       </Routes>
     </BrowserRouter>
   </div>

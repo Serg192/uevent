@@ -8,7 +8,18 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    uploadAvatar: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/users/${id}/avatar`,
+        method: "POST",
+        body: formData,
+      }),
+    }),
   }),
 });
 
-export const { useGetMeMutation } = userApiSlice;
+export const { 
+  useGetMeMutation,
+  useUploadAvatarMutation
+} = userApiSlice;

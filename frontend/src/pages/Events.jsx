@@ -29,7 +29,6 @@ const Events = () => {
   // const [getMy] = useGetMyEventsMutation();
 
   const loadEvents = async () => {
-    console.log(' 1 displayEvents = ' + displayEvents)
     if (displayEvents) {
       setPage(1);
       setEvents([]);
