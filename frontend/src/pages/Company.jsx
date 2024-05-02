@@ -10,6 +10,7 @@ import {
   Divider,
   Select,
   MenuItem,
+  Switch,
 } from "@mui/material";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,6 +31,7 @@ import {
   EditEvent,
   PageController,
   EventSimplifiedPreview,
+  EventCalendar,
 } from "../components";
 import { dateFilterOptions, getDatePeriod } from "../helpers/date-helper";
 
@@ -51,6 +53,7 @@ const Company = () => {
   const [selectedDateFilterOption, setSelectedDateFilterOption] =
     useState("All");
 
+  const [showInCalendar, setShowInCalendar] = useState(false);
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
   const userData = useSelector(selectCurrentUser);
@@ -106,6 +109,11 @@ const Company = () => {
   useEffect(() => {
     loadCompanyData();
   }, [cid, isCompanyModalOpen, followClicked]);
+
+  useEffect(() => {
+    setSelectedDateFilterOption(dateFilterOptions[0]);
+    loadCompanyEvents();
+  }, [showInCalendar]);
 
   const handleFollow = async () => {
     if (!userData) {
@@ -243,10 +251,12 @@ const Company = () => {
               <Typography variant="h5">Events</Typography>
               <Select
                 value={selectedDateFilterOption}
+                sx={{ width: "150px" }}
                 onChange={(event) =>
                   setSelectedDateFilterOption(event.target.value)
                 }
                 variant="outlined"
+                disabled={showInCalendar}
                 fullWidth
               >
                 {dateFilterOptions.map((option) => (
@@ -255,6 +265,16 @@ const Company = () => {
                   </MenuItem>
                 ))}
               </Select>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Typography variant="h5">Calendar:</Typography>
+                <Switch
+                  checked={showInCalendar}
+                  onChange={() => {
+                    setShowInCalendar((prev) => !prev);
+                  }}
+                  color="primary"
+                />
+              </Stack>
             </Stack>
 
             {isOwner && (
@@ -275,19 +295,26 @@ const Company = () => {
             sx={{ mt: 1, backgroundColor: "gray" }}
             flexItem
           />
-          <Stack direction="column" alignItems="center" width="100%">
-            {events?.map((e) => (
-              <EventSimplifiedPreview key={e._id} event={e} />
-            ))}
-            {events?.length ? (
-              <PageController
-                paginationInfo={paginationInfo}
-                setPage={setPage}
-              />
-            ) : (
-              <></>
-            )}
-          </Stack>
+          {!showInCalendar && (
+            <Stack direction="column" alignItems="center" width="100%">
+              {events?.map((e) => (
+                <EventSimplifiedPreview key={e._id} event={e} />
+              ))}
+              {events?.length ? (
+                <PageController
+                  paginationInfo={paginationInfo}
+                  setPage={setPage}
+                />
+              ) : (
+                <></>
+              )}
+            </Stack>
+          )}
+          {showInCalendar && (
+            <Box width="100%">
+              <EventCalendar events={events} />
+            </Box>
+          )}
         </Paper>
       </Stack>
       <EditCompany
