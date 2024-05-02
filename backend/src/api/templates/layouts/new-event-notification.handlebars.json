@@ -1,0 +1,10 @@
+{
+  "username": "User123",
+  "companyName": "Uevent team",
+  "eventTitle": "Some event 1",
+  "eventDate": "Some date",
+  "eventLocation": "Location",
+  "eventDescription": "Description",
+  "eventPrice": "10$",
+  "eventTickets": "100"
+}

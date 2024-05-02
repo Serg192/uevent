@@ -1,6 +1,7 @@
 const HttpStatus = require("http-status-codes").StatusCodes;
 const Event = require("../models/event-model");
 const User = require("../models/user-model");
+const Company = require("../models/company-model");
 const EventSubscriptionModel = require("../models/event-subscription-model");
 const PromoCodeModel = require("../models/promo-codes-model");
 const s3Service = require("./s3-service");
@@ -11,6 +12,11 @@ const { lineEventItem } = require("../helpers/payment-helper");
 const { paginate } = require("../helpers/pagination-helper");
 const { encrypt, decrypt } = require("../helpers/encryption-helper");
 const { default: mongoose } = require("mongoose");
+
+const {
+  sendEmail,
+  EVENT_CREATED_TEMPLATE,
+} = require("../helpers/email-helper");
 
 const createEvent = async (eventData, companyId) => {
   const { lat, long, ...data } = eventData;
@@ -24,7 +30,27 @@ const createEvent = async (eventData, companyId) => {
     company: companyId,
   });
 
-  return await event.save();
+  const response = await event.save();
+
+  const company = await Company.findById(companyId)
+    .populate("followers")
+    .exec();
+
+  company.followers.forEach((f) => {
+    const context = {
+      username: f.username,
+      companyName: company.name,
+      eventTitle: response.name,
+      eventDate: response.date,
+      eventLocation: response.address,
+      eventDescription: response.description,
+      eventPrice: response.price === 0 ? "Free" : response.price,
+      eventTickets: response.ticketsAvailable,
+    };
+    sendEmail(f.email, "Event notification", EVENT_CREATED_TEMPLATE, context);
+  });
+
+  return response;
 };
 
 const updateEvent = async (eventData, eventId) => {

@@ -60,6 +60,13 @@ const login = async (userData) => {
 
   if (!user) throw error;
 
+  if (!user.emailVerified) {
+    throw {
+      statusCode: HttpStatus.UNAUTHORIZED,
+      message: "Please verify your email",
+    };
+  }
+
   try {
     const result = await bcryptCompareAsync(userData.password, user.password);
     if (!result) throw error;

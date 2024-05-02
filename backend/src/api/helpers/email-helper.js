@@ -5,6 +5,7 @@ const logger = require("../../config/logger");
 
 const VERIFY_EMAIL_TEMPLATE = "verify-email";
 const RESET_PASSWORD_TEMPLATE = "reset-password";
+const EVENT_CREATED_TEMPLATE = "new-event-notification";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -51,4 +52,5 @@ module.exports = {
   sendEmail,
   VERIFY_EMAIL_TEMPLATE,
   RESET_PASSWORD_TEMPLATE,
+  EVENT_CREATED_TEMPLATE,
 };
