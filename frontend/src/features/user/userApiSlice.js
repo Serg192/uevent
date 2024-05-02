@@ -10,8 +10,8 @@ export const userApiSlice = apiSlice.injectEndpoints({
     }),
 
     uploadAvatar: builder.mutation({
-      query: ({ id, formData }) => ({
-        url: `/users/${id}/avatar`,
+      query: ({ formData }) => ({
+        url: `/users/avatar`,
         method: "POST",
         body: formData,
       }),

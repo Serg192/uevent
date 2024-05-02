@@ -29,8 +29,7 @@ const Events = () => {
     setPage(1);
     setEvents([]);
     if (
-      (selectedOption === "Followed" || selectedOption === "My companies") &&
-      !userData
+      selectedOption === "Subscribed" && !userData
     ) {
       return;
     }
