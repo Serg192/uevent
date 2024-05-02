@@ -40,7 +40,16 @@ const EventPreview = ({ eventData }) => {
             <Typography variant="h4">{name}</Typography>
             <Typography variant="h5">Description: {description}</Typography>
             <Typography variant="body1">Address: {address}</Typography>
-            <Typography variant="body1">Date: {date}</Typography>
+            <Typography variant="body1">
+              Date:{" "}
+              {new Date(date).toLocaleString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })}
+            </Typography>
           </Stack>
         </Stack>
       </Link>
