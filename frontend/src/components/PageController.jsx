@@ -10,8 +10,6 @@ const PageController = ({ paginationInfo, setPage }) => {
   total = Number(total);
   pageSize = Number(pageSize);
 
-  console.log("Page Controller", currentPage, total);
-
   return (
     <Stack direction="row" alignItems="center">
       <IconButton

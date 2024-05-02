@@ -29,8 +29,6 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("Current user", userData?.user);
-
   const handleLogout = async () => {
     try {
       await logoutFromUevent().unwrap();

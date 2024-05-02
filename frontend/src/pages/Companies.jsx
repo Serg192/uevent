@@ -36,11 +36,9 @@ const Companies = () => {
       (selectedOption === "Followed" || selectedOption === "My companies") &&
       !userData
     ) {
-      console.log("Early return");
       return;
     }
     try {
-      // This should be optimized on the backend
       let response = null;
       switch (selectedOption) {
         case "All":
@@ -120,7 +118,7 @@ const Companies = () => {
         <Typography variant="h4">You should log in to see this data</Typography>
       )}
       {companies?.map((data) => (
-        <CompanyPreview companyData={data} />
+        <CompanyPreview key={data._id} companyData={data} />
       ))}
       <EditCompany isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       {companies?.length ? (

@@ -81,7 +81,6 @@ const Event = () => {
         pageSize: response.data.pageSize,
         total: response.data.total,
       });
-      console.log("Get users", response.data.data);
     } catch (err) {
       console.log(err);
     }
@@ -101,7 +100,6 @@ const Event = () => {
       );
       setSubscribed(response.data.subscribed);
 
-      console.log("load event data", response);
       if (response.data.subscribed) {
         setVisibleToPublic(response.data.visibleToPublic);
       }
@@ -168,7 +166,7 @@ const Event = () => {
           <Typography variant="h5" pl={2} pt={2}>
             {eventData?.address}
           </Typography>
-          {isLoaded && (
+          {isLoaded && eventData && (
             <GoogleMap
               center={{
                 lat: eventData?.location.coordinates[0],
@@ -271,7 +269,7 @@ const Event = () => {
             />
             <Stack direction="column" alignItems="center">
               {subscribedUsers?.map((uData) => (
-                <EventUserPreview user={uData.user} />
+                <EventUserPreview key={uData.user._id} user={uData.user} />
               ))}
               {subscribedUsers?.length ? (
                 <PageController

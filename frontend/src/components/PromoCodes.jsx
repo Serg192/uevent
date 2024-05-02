@@ -47,7 +47,7 @@ const PromoCodes = ({ isOpen, setIsOpen, eventId }) => {
         page,
         pageSize: 5,
       }).unwrap();
-      console.log("Codes loaded", response);
+
       setMyCodes(response.data.data);
       setPaginationInfo({
         currentPage: response.data.currentPage,
@@ -146,6 +146,7 @@ const PromoCodes = ({ isOpen, setIsOpen, eventId }) => {
           >
             {myCodes?.map((c) => (
               <Paper
+                key={c._id}
                 elevation={3}
                 sx={{
                   alignItems: "start",

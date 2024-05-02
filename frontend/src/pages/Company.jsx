@@ -19,8 +19,6 @@ import {
   useGetCompanyEventsMutation,
 } from "../features/company/companyApiSlice";
 
-import { setKey, fromLatLng, setLocationType } from "react-geocode";
-
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -31,9 +29,6 @@ import {
   PageController,
   EventSimplifiedPreview,
 } from "../components";
-
-setKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
-setLocationType("ROOFTOP");
 
 const Company = () => {
   const { cid } = useParams();
@@ -103,18 +98,6 @@ const Company = () => {
   useEffect(() => {
     loadCompanyData();
   }, [cid, isCompanyModalOpen, followClicked]);
-
-  // useEffect(() => {
-  //   if (companyData)
-  //     fromLatLng(
-  //       companyData.location.coordinates[0],
-  //       companyData.location.coordinates[1]
-  //     )
-  //       .then(({ results }) => {
-  //         setAddress(results[0]?.formatted_address);
-  //       })
-  //       .catch(console.error);
-  // }, [companyData]);
 
   const handleFollow = async () => {
     if (!userData) {
@@ -220,7 +203,7 @@ const Company = () => {
           <Typography variant="h5" sx={{ color: "rgba(0, 0, 0, 0.5)" }}>
             Address: {address}
           </Typography>
-          {isLoaded && (
+          {isLoaded && companyData && (
             <GoogleMap
               center={{
                 lat: companyData?.location.coordinates[0],
@@ -269,7 +252,7 @@ const Company = () => {
           />
           <Stack direction="column" alignItems="center" width="100%">
             {events?.map((e) => (
-              <EventSimplifiedPreview event={e} />
+              <EventSimplifiedPreview key={e._id} event={e} />
             ))}
             {events?.length ? (
               <PageController

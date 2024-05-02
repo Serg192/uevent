@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Stack, Typography, Button, Select, MenuItem } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Stack, Typography, Select, MenuItem } from "@mui/material";
 
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../features/auth/authSlice";
-import { useNavigate } from "react-router-dom";
 import { EventPreview, PageController } from "../components";
 
 import {
@@ -19,13 +17,10 @@ const Events = () => {
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
 
-  // const navigate = useNavigate();
   const userData = useSelector(selectCurrentUser);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [getAll] = useGetAllEventsMutation();
   const [getSubscribed] = useGetSubscribedEventsMutation();
-  // const [getMy] = useGetMyEventsMutation();
 
   const loadEvents = async () => {
     setPage(1);
@@ -34,7 +29,6 @@ const Events = () => {
       (selectedOption === "Followed" || selectedOption === "My companies") &&
       !userData
     ) {
-      console.log("Early return");
       return;
     }
     try {
@@ -95,22 +89,14 @@ const Events = () => {
             </MenuItem>
           ))}
         </Select>
-        {/* <Button
-          variant="contained"
-          onClick={handleCreate}
-          startIcon={<AddIcon />}
-          sx={{ pl: 5, pr: 5 }}
-        >
-          Create
-        </Button> */}
       </Stack>
       {selectedOption !== "All" && !userData && (
         <Typography variant="h4">You should log in to see this data</Typography>
       )}
       {events?.map((data) => (
-        <EventPreview eventData={data} />
+        <EventPreview key={data._id} eventData={data} />
       ))}
-      {/* <EditEvent isOpen={isModalOpen} setIsOpen={setIsModalOpen} /> */}
+
       {events?.length ? (
         <PageController paginationInfo={paginationInfo} setPage={setPage} />
       ) : (

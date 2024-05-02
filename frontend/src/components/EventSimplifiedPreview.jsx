@@ -1,22 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Chip, Stack, Typography, Paper } from "@mui/material";
-import { setKey, fromLatLng, setLocationType } from "react-geocode";
 import { Link } from "react-router-dom";
 
-setKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
-setLocationType("ROOFTOP");
-
 const EventSimplifiedPreview = ({ event }) => {
-  const [address, setAddress] = useState("");
-  useEffect(() => {
-    fromLatLng(event.location.coordinates[0], event.location.coordinates[1])
-      .then(({ results }) => {
-        setAddress(results[0]?.formatted_address);
-      })
-      .catch(console.error);
-  }, []);
-  console.log(event);
-
   const createChip = (text) => {
     return (
       <Chip
@@ -50,9 +36,9 @@ const EventSimplifiedPreview = ({ event }) => {
             <Typography variant="h6">Date: {event.date}</Typography>
             <Typography variant="body1">
               Location:{" "}
-              {address?.length > 40
-                ? address?.substring(0, 40) + "..."
-                : address}
+              {event.address.length > 40
+                ? event.address.substring(0, 40) + "..."
+                : event.address}
             </Typography>
           </Stack>
           <Stack direction="column" alignItems="center">
