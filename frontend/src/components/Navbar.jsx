@@ -29,7 +29,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("Current user", userData?.user?.profilePicture);
+  console.log("Current user", userData?.user);
 
   const handleLogout = async () => {
     try {
@@ -90,7 +90,9 @@ const Navbar = () => {
                     src={userData?.user?.profilePicture}
                     sx={{ width: 32, height: 32 }}
                   />
-                  <Typography variant="h5" color="white">{userData?.user?.username}</Typography>
+                  <Typography variant="h5" color="white">
+                    {userData?.user?.username}
+                  </Typography>
                 </Stack>
               </Link>
 

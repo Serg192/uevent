@@ -1,31 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Typography, Box, Stack, Paper } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useLoadScript, usePlacesAutocomplete } from "@react-google-maps/api";
-import { setKey, fromLatLng, setLocationType } from "react-geocode";
-
-setKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
-setLocationType("ROOFTOP");
-
-const libraries = ["places"];
 
 const EventPreview = ({ eventData }) => {
-  const { _id, name, description, date, location, company, eventPicture } = eventData;
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
-  const [address, setAddress] = useState("");
-
-  useEffect(() => {
-    fromLatLng(location.coordinates[0], location.coordinates[1])
-      .then(({ results }) => {
-        console.log(results[0]?.formatted_address);
-        setAddress(results[0]?.formatted_address);
-      })
-      .catch(console.error);
-  }, [location]);
-
+  const { _id, name, description, date, eventPicture, address } = eventData;
   return (
     <Paper
       elevation={2}
