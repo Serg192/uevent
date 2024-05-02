@@ -10,16 +10,17 @@ import {
   Divider,
 } from "@mui/material";
 
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "../features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCurrentUser, setUser } from "../features/auth/authSlice";
 
 import { useGetSubscribedEventsMutation } from "../features/event/eventApiSlice";
 
-import { useUploadAvatarMutation } from "../features/user/userApiSlice";
+import { useGetMeMutation, useUploadAvatarMutation } from "../features/user/userApiSlice";
 
 import { PageController, EventSimplifiedPreview } from "../components";
 
 const Profile = () => {
+  const dispatch = useDispatch();
   const userData = useSelector(selectCurrentUser);
   const isAdmin = userData?.user?.role === "admin";
   const isLargeScreen = useMediaQuery("(min-width:850px)");
@@ -34,6 +35,7 @@ const Profile = () => {
 
   const [getSubscribed] = useGetSubscribedEventsMutation();
   const [uploadAvatar] = useUploadAvatarMutation();
+  const [getMe] = useGetMeMutation();
 
   const loadSubscribedEvents = async () => {
     console.log("start");
@@ -61,20 +63,16 @@ const Profile = () => {
 
   const handleAvatarUpload = async () => {
     if (file) {
-      console.log("User:");
-      console.log(userData);
       const formData = new FormData();
       formData.append("image", file);
       try {
-        console.log(formData);
         const data = await uploadAvatar({
-          id: userData.user._id,
           formData,
         }).unwrap();
 
-        console.log("Data:");
-        console.log(data);
         setAvatar(data.url);
+        const user = await getMe().unwrap();
+        dispatch(setUser({ ...user }));
       } catch (err) {
         console.error("Error uploading photo:", err);
       }
@@ -137,17 +135,6 @@ const Profile = () => {
           >
             Change Avatar
           </Button>
-
-          {isAdmin && (
-            <Button
-              variant="contained"
-              sx={{
-                mt: 2,
-              }}
-            >
-              Admin Panel
-            </Button>
-          )}
         </Paper>
       </Paper>
 
