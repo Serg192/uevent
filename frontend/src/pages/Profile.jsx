@@ -16,7 +16,7 @@ import { selectCurrentUser, setUser } from "../features/auth/authSlice";
 import { useGetSubscribedEventsMutation } from "../features/event/eventApiSlice";
 import { useGetMeMutation, useUploadAvatarMutation } from "../features/user/userApiSlice";
 import { useGetMyCompaniesMutation } from "../features/company/companyApiSlice";
-import { PageController, EventPreview, CompanyPreview } from "../components";
+import { PageController, EventSimplifiedPreview, CompanyPreview } from "../components";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -202,8 +202,8 @@ const Profile = () => {
             flexItem
           />
           <Stack direction="column" alignItems="center" width="100%">
-            {subEvents?.map((data) => (
-              <EventPreview key={data._id} eventData={data} />
+            {subEvents?.map((e) => (
+              <EventSimplifiedPreview key={e._id} event={e} />
             ))}
             {subEvents?.length ? (
               <PageController
