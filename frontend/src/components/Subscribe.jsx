@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Stack,
   Button,
@@ -17,12 +17,13 @@ const Subscribe = ({ isOpen, setIsOpen, eventId }) => {
 
   const handleSubscribe = async () => {
     try {
-      const data = { id: eventId };
+      let data = { id: eventId };
       if (code?.length) {
-        data.data.code = code;
+        data.data = { code };
       }
-      const response = await subscribe(data).unwrap();
 
+      const response = await subscribe(data).unwrap();
+      setCode("");
       const url = response.data.url;
       if (url) {
         window.open(url, "_blank");
@@ -32,6 +33,10 @@ const Subscribe = ({ isOpen, setIsOpen, eventId }) => {
     }
     setIsOpen(false);
   };
+
+  useEffect(() => {
+    setCode("");
+  }, []);
   return (
     <Modal open={isOpen}>
       <Box

@@ -22,6 +22,12 @@ router.post(
   catchAsyncErr(companyController.createCompany)
 );
 
+router.get(
+  "/followed",
+  jwtAuth,
+  catchAsyncErr(companyController.getFollowedCompanies)
+);
+
 router.patch(
   "/:id",
   jwtAuth,
@@ -58,11 +64,6 @@ router.get(
 
 ///////////////////
 
-router.get(
-  "/followed",
-  jwtAuth,
-  catchAsyncErr(companyController.getFollowedCompanies)
-);
 router.post(
   "/:id/toggle-follow",
   jwtAuth,

@@ -20,12 +20,14 @@ import {
 } from "@mui/material";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import EditIcon from "@mui/icons-material/Edit";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import {
   EditEvent,
   Subscribe,
   PageController,
   EventUserPreview,
+  PromoCodes,
 } from "../components";
 
 const Event = () => {
@@ -44,6 +46,7 @@ const Event = () => {
 
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
+  const [isPromoCodesModalOpen, setIsPromoCodesModalOpen] = useState(false);
   const userData = useSelector(selectCurrentUser);
 
   const [getEvent] = useGetEventMutation();
@@ -165,25 +168,27 @@ const Event = () => {
           <Typography variant="h5" pl={2} pt={2}>
             {eventData?.address}
           </Typography>
-          <GoogleMap
-            center={{
-              lat: eventData?.location.coordinates[0],
-              lng: eventData?.location.coordinates[1],
-            }}
-            zoom={15}
-            mapContainerStyle={{
-              width: "100%",
-              height: "400px",
-              marginTop: "16px",
-            }}
-          >
-            <Marker
-              position={{
+          {isLoaded && (
+            <GoogleMap
+              center={{
                 lat: eventData?.location.coordinates[0],
                 lng: eventData?.location.coordinates[1],
               }}
-            />
-          </GoogleMap>
+              zoom={15}
+              mapContainerStyle={{
+                width: "100%",
+                height: "400px",
+                marginTop: "16px",
+              }}
+            >
+              <Marker
+                position={{
+                  lat: eventData?.location.coordinates[0],
+                  lng: eventData?.location.coordinates[1],
+                }}
+              />
+            </GoogleMap>
+          )}
         </Stack>
         <Stack direction="column" width={isLargeScreen ? "50%" : "100%"}>
           <Stack
@@ -194,13 +199,23 @@ const Event = () => {
             justifyContent="flex-end"
           >
             {isOwner && (
-              <Button
-                variant="contained"
-                startIcon={<EditIcon />}
-                onClick={() => setIsEditEventModalOpen(true)}
-              >
-                Edit
-              </Button>
+              <>
+                <Button
+                  variant="contained"
+                  startIcon={<EditIcon />}
+                  onClick={() => setIsEditEventModalOpen(true)}
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  variant="contained"
+                  startIcon={<SettingsIcon />}
+                  onClick={() => setIsPromoCodesModalOpen(true)}
+                >
+                  Promo codes
+                </Button>
+              </>
             )}
             {!isOwner && subscribed && (
               <Button
@@ -280,6 +295,11 @@ const Event = () => {
       <Subscribe
         isOpen={isSubscribeModalOpen}
         setIsOpen={setIsSubscribeModalOpen}
+        eventId={eid}
+      />
+      <PromoCodes
+        isOpen={isPromoCodesModalOpen}
+        setIsOpen={setIsPromoCodesModalOpen}
         eventId={eid}
       />
     </Box>

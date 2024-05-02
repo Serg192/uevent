@@ -168,7 +168,8 @@ const createPaymentSession = async (eventId, userId, promoCode) => {
     [lineEventItem(event, discount)],
     user.email,
     event.company.stripeId,
-    { userId, eventId: event._id.toString() }
+    { userId, eventId: event._id.toString() },
+    eventId
   );
 
   return { subscribed: false, url: session.url };
@@ -256,8 +257,9 @@ const deletePromoCode = async (codeId) => {
   await PromoCodeModel.findByIdAndDelete(codeId);
 };
 
-const getEventPromoCodes = async (eventId) => {
-  return await PromoCodeModel.find({ event: eventId });
+const getEventPromoCodes = async (pagination, eventId) => {
+  return await paginate(PromoCodeModel, pagination, { event: eventId });
+  //return await PromoCodeModel.find({ event: eventId });
 };
 
 module.exports = {

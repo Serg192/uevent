@@ -9,11 +9,11 @@ const createAccount = async () => {
   return account;
 };
 
-const getOnboardingLink = async (stripeId) => {
+const getOnboardingLink = async (stripeId, companyId) => {
   return await stripe.accountLinks.create({
     account: stripeId,
-    refresh_url: process.env.CLIENT_URL,
-    return_url: process.env.CLIENT_URL,
+    refresh_url: `${process.env.CLIENT_URL}/companies/${companyId}`,
+    return_url: `${process.env.CLIENT_URL}/companies/${companyId}`,
     type: "account_onboarding",
   });
 };
@@ -32,13 +32,14 @@ const createPaymentSession = async (
   items,
   customerEmail,
   destination,
-  paymentMetadata
+  paymentMetadata,
+  eventId
 ) => {
   const params = {
     payment_method_types: ["card"],
     mode: "payment",
-    success_url: `${process.env.CLIENT_URL}/payment?success=true`,
-    cancel_url: `${process.env.CLIENT_URL}/payment?success=false`,
+    success_url: `${process.env.CLIENT_URL}/events/${eventId}?payment=true`,
+    cancel_url: `${process.env.CLIENT_URL}/events/${eventId}?payment=false`,
     line_items: items,
     customer_email: customerEmail,
     payment_intent_data: {

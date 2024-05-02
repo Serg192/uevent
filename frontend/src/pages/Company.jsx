@@ -89,7 +89,7 @@ const Company = () => {
       setCompanyData(response.data);
       setIsOwner(response.data.owner === userData?.user._id);
       setFollower(response.data.followers.includes(userData?.user._id));
-
+      setAddress(response.data.address);
       await loadCompanyEvents();
     } catch (err) {
       console.log(err);
@@ -104,17 +104,17 @@ const Company = () => {
     loadCompanyData();
   }, [cid, isCompanyModalOpen, followClicked]);
 
-  useEffect(() => {
-    if (companyData)
-      fromLatLng(
-        companyData.location.coordinates[0],
-        companyData.location.coordinates[1]
-      )
-        .then(({ results }) => {
-          setAddress(results[0]?.formatted_address);
-        })
-        .catch(console.error);
-  }, [companyData]);
+  // useEffect(() => {
+  //   if (companyData)
+  //     fromLatLng(
+  //       companyData.location.coordinates[0],
+  //       companyData.location.coordinates[1]
+  //     )
+  //       .then(({ results }) => {
+  //         setAddress(results[0]?.formatted_address);
+  //       })
+  //       .catch(console.error);
+  // }, [companyData]);
 
   const handleFollow = async () => {
     if (!userData) {
@@ -286,7 +286,6 @@ const Company = () => {
         isOpen={isCompanyModalOpen}
         setIsOpen={setIsCompanyModalOpen}
         initData={companyData}
-        initAddress={address}
       />
       <StripeMenu
         isOpen={isStripeModalOpen}

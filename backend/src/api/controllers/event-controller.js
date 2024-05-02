@@ -92,7 +92,11 @@ const deletePromoCode = async (req, res) => {
 };
 
 const getEventPromoCodes = async (req, res) => {
-  const data = await eventService.getEventPromoCodes(req.params.eid);
+  const pagination = parsePagination(req);
+  const data = await eventService.getEventPromoCodes(
+    pagination,
+    req.params.eid
+  );
   return res.status(HttpStatus.OK).json({ data });
 };
 

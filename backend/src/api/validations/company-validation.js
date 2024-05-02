@@ -6,6 +6,7 @@ const CreateCompany = Joi.object({
   email: Joi.string().email().required(),
   lat: Joi.number().required().min(LAT.min).max(LAT.max),
   long: Joi.number().required().min(LONG.min).max(LONG.max),
+  address: Joi.string().required(),
 });
 
 const UpdateCompany = Joi.object({
@@ -13,6 +14,7 @@ const UpdateCompany = Joi.object({
   email: Joi.string().email(),
   lat: Joi.number().min(LAT.min).max(LAT.max),
   long: Joi.number().min(LONG.min).max(LONG.max),
+  address: Joi.string(),
 });
 
 module.exports = { CreateCompany, UpdateCompany };

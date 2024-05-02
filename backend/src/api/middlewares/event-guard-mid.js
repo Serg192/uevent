@@ -22,7 +22,7 @@ function eventGuard(auth = "owner") {
   return async (req, res, next) => {
     const owner = auth === "owner";
     const event = await getEvent(req, res);
-    const company = await Company.findById(event.company._id);
+    const company = await Company.findById(event.company);
 
     if (!company) {
       return res

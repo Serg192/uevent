@@ -59,18 +59,27 @@ export const eventApiSlice = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
-    // getMyEvents: builder.mutation({
-    //   query: ({ page, pageSize }) => ({
-    //     url: `/events/my?page=${page}&pageSize=${pageSize}`,
-    //     method: "GET",
-    //   }),
-    // }),
-    // getEvent: builder.mutation({
-    //   query: ({ id }) => ({
-    //     url: `/events/${id}`,
-    //     method: "GET",
-    //   }),
-    // }),
+    createPromoCode: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/events/${id}/promo`,
+        method: "POST",
+        body: { ...data },
+      }),
+    }),
+
+    deletePromoCode: builder.mutation({
+      query: ({ eid, id }) => ({
+        url: `/events/${eid}/promo/${id}`,
+        method: "DELETE",
+      }),
+    }),
+
+    loadPromoCodes: builder.mutation({
+      query: ({ id, page, pageSize }) => ({
+        url: `/events/${id}/promo?page=${page}&pageSize=${pageSize}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -83,4 +92,7 @@ export const {
   useUploadBannerMutation,
   useSubscribeMutation,
   useToggleVisibleToPublicMutation,
+  useCreatePromoCodeMutation,
+  useLoadPromoCodesMutation,
+  useDeletePromoCodeMutation,
 } = eventApiSlice;

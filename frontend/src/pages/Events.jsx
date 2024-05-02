@@ -15,7 +15,6 @@ import {
 const Events = () => {
   const options = ["All", "Subscribed"];
   const [selectedOption, setSelectedOption] = useState(options[0]);
-  const [displayEvents, setDisplayEvents] = useState(true);
   const [events, setEvents] = useState([]);
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
@@ -29,45 +28,43 @@ const Events = () => {
   // const [getMy] = useGetMyEventsMutation();
 
   const loadEvents = async () => {
-    if (displayEvents) {
-      setPage(1);
-      setEvents([]);
-      try {
-        let response = null;
-        switch (selectedOption) {
-          case "All":
-            response = await getAll({ page, pageSize: 10 }).unwrap();
-            setEvents(response.result.data);
-            break;
-          case "Subscribed":
-            response = await getSubscribed({ page, pageSize: 10 }).unwrap();
-            setEvents(response.result.data);
-            break;
-          default:
-        }
-        if (response) {
-          setPaginationInfo({
-            currentPage: response.result.currentPage,
-            pageSize: response.result.pageSize,
-            total: response.result.total,
-          });
-        }
-      } catch (err) {
-        console.log(err);
+    setPage(1);
+    setEvents([]);
+    if (
+      (selectedOption === "Followed" || selectedOption === "My companies") &&
+      !userData
+    ) {
+      console.log("Early return");
+      return;
+    }
+    try {
+      let response = null;
+      switch (selectedOption) {
+        case "All":
+          response = await getAll({ page, pageSize: 10 }).unwrap();
+          setEvents(response.result.data);
+          break;
+        case "Subscribed":
+          response = await getSubscribed({ page, pageSize: 10 }).unwrap();
+          setEvents(response.result.data);
+          break;
+        default:
       }
+      if (response) {
+        setPaginationInfo({
+          currentPage: response.result.currentPage,
+          pageSize: response.result.pageSize,
+          total: response.result.total,
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
   useEffect(() => {
-    console.log(`${selectedOption}`);
-    setDisplayEvents(!(selectedOption !== "All" && !userData));
     loadEvents();
   }, [selectedOption, page, userData]);
-
-  // const handleCreate = () => {
-  //   if (!userData) navigate("/login");
-  //   else setIsModalOpen(true);
-  // };
 
   return (
     <Stack
@@ -110,8 +107,9 @@ const Events = () => {
       {selectedOption !== "All" && !userData && (
         <Typography variant="h4">You should log in to see this data</Typography>
       )}
-      {displayEvents &&
-        events?.map((data) => <EventPreview eventData={data} />)}
+      {events?.map((data) => (
+        <EventPreview eventData={data} />
+      ))}
       {/* <EditEvent isOpen={isModalOpen} setIsOpen={setIsModalOpen} /> */}
       {events?.length ? (
         <PageController paginationInfo={paginationInfo} setPage={setPage} />

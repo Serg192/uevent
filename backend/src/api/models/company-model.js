@@ -27,6 +27,9 @@ const CompanyModel = new Schema({
       required: true,
     },
   },
+  address: {
+    type: String,
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",

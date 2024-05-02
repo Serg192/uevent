@@ -19,7 +19,7 @@ const createCompany = async (companyData, userId) => {
     };
   }
 
-  const { name, email, lat, long } = companyData;
+  const { name, email, lat, long, address } = companyData;
   const user = await User.findById(userId);
 
   const newCompany = new Company({
@@ -32,6 +32,7 @@ const createCompany = async (companyData, userId) => {
     emailVerified: false,
     owner: user._id,
     followers: [],
+    address,
   });
 
   return await newCompany.save();
@@ -109,7 +110,7 @@ const connectToStripe = async (companyId) => {
     company.stripeId = account.id;
     await company.save();
   }
-  return await paymentService.getOnboardingLink(company.stripeId);
+  return await paymentService.getOnboardingLink(company.stripeId, companyId);
 };
 
 const getStripeAccount = async (companyId) => {

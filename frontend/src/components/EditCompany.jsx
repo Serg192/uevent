@@ -21,7 +21,7 @@ import { EMAIL_REGEX } from "../const/regex";
 
 const placesLibrary = ["places"];
 
-const CreateCompany = ({ isOpen, setIsOpen, initData, initAddress }) => {
+const CreateCompany = ({ isOpen, setIsOpen, initData }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState(null);
@@ -74,7 +74,8 @@ const CreateCompany = ({ isOpen, setIsOpen, initData, initAddress }) => {
       setName(initData.name);
       setEmail(initData.email);
       setLogo(initData.logo);
-      setAddress(initAddress);
+      setAddress(initData.address);
+      console.log("EDIT COMPANY", initData);
     }
   }, [isOpen]);
 
@@ -101,6 +102,7 @@ const CreateCompany = ({ isOpen, setIsOpen, initData, initAddress }) => {
               email,
               lat: lat || initData.location.coordinates[0],
               long: long || initData.location.coordinates[1],
+              address,
             },
           }).unwrap();
         } else {
@@ -109,6 +111,7 @@ const CreateCompany = ({ isOpen, setIsOpen, initData, initAddress }) => {
             email,
             lat,
             long,
+            address,
           }).unwrap();
         }
 

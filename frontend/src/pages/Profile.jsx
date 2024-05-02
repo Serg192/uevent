@@ -11,25 +11,17 @@ import {
 } from "@mui/material";
 
 import { useSelector } from "react-redux";
-// import { useGetMeMutation } from "../features/user/userApiSlice";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
-import {
-  useGetSubscribedEventsMutation,
-} from "../features/event/eventApiSlice";
+import { useGetSubscribedEventsMutation } from "../features/event/eventApiSlice";
 
-import {
-  useUploadAvatarMutation,
-} from "../features/user/userApiSlice";
+import { useUploadAvatarMutation } from "../features/user/userApiSlice";
 
-import {
-  PageController,
-  EventSimplifiedPreview,
-} from "../components";
+import { PageController, EventSimplifiedPreview } from "../components";
 
 const Profile = () => {
-  const userData =  useSelector(selectCurrentUser);
-  const isAdmin = userData?.user?.role === 'admin';
+  const userData = useSelector(selectCurrentUser);
+  const isAdmin = userData?.user?.role === "admin";
   const isLargeScreen = useMediaQuery("(min-width:850px)");
 
   const [events, setEvents] = useState(null);
@@ -39,21 +31,21 @@ const Profile = () => {
   const [file, setFile] = useState();
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState(null);
-  
+
   const [getSubscribed] = useGetSubscribedEventsMutation();
   const [uploadAvatar] = useUploadAvatarMutation();
 
   const loadSubscribedEvents = async () => {
-    console.log("start")
+    console.log("start");
     setPage(1);
     setEvents([]);
     try {
       let response = null;
       response = await getSubscribed({ page, pageSize: 10 }).unwrap();
-      console.log(response.result.data)
+      console.log(response.result.data);
       setEvents(response.result.data);
 
-      console.log(events)
+      console.log(events);
 
       if (response) {
         setPaginationInfo({
@@ -69,8 +61,8 @@ const Profile = () => {
 
   const handleAvatarUpload = async () => {
     if (file) {
-      console.log("User:")
-      console.log(userData)
+      console.log("User:");
+      console.log(userData);
       const formData = new FormData();
       formData.append("image", file);
       try {
@@ -80,8 +72,8 @@ const Profile = () => {
           formData,
         }).unwrap();
 
-        console.log("Data:")
-        console.log(data)
+        console.log("Data:");
+        console.log(data);
         setAvatar(data.url);
       } catch (err) {
         console.error("Error uploading photo:", err);
@@ -130,16 +122,16 @@ const Profile = () => {
             {name}
           </Typography>
           <input
-              type="file"
-              inputProps={{ accept: "image/*" }}
-              onChange={(e) => {
-                setFile(e.target.files[0]);
-              }}
-            />
-          <Button 
+            type="file"
+            inputProps={{ accept: "image/*" }}
+            onChange={(e) => {
+              setFile(e.target.files[0]);
+            }}
+          />
+          <Button
             variant="contained"
             sx={{
-              mt: 2
+              mt: 2,
             }}
             onClick={() => handleAvatarUpload()}
           >
@@ -147,12 +139,14 @@ const Profile = () => {
           </Button>
 
           {isAdmin && (
-            <Button 
-              variant="contained"                
+            <Button
+              variant="contained"
               sx={{
-                mt: 2
+                mt: 2,
               }}
-            >Admin Panel</Button>
+            >
+              Admin Panel
+            </Button>
           )}
         </Paper>
       </Paper>

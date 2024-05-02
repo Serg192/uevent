@@ -16,7 +16,6 @@ import {
 const Companies = () => {
   const options = ["All", "Followed", "My companies"];
   const [selectedOption, setSelectedOption] = useState(options[0]);
-  const [displayCompanies, setDisplayCompanies] = useState(true);
   const [companies, setCompanies] = useState([]);
   const [paginationInfo, setPaginationInfo] = useState({});
   const [page, setPage] = useState(1);
@@ -30,46 +29,49 @@ const Companies = () => {
   const [getMy] = useGetMyCompaniesMutation();
 
   const loadCompanies = async () => {
-    if (displayCompanies) {
-      setPage(1);
-      setCompanies([]);
-      try {
-        // This should be optimized on the backend
-        let response = null;
-        switch (selectedOption) {
-          case "All":
-            response = await getAll({ page, pageSize: 10 }).unwrap();
-            setCompanies(response.data.data);
-            break;
-          case "Followed":
-            response = await getFollowed({ page, pageSize: 10 }).unwrap();
-            setCompanies(response.data.data);
-            break;
-          case "My companies":
-            response = await getMy({ page, pageSize: 10 }).unwrap();
-            setCompanies(response.data.data);
-            break;
-          default:
-        }
-        if (response) {
-          setPaginationInfo({
-            currentPage: response.data.currentPage,
-            pageSize: response.data.pageSize,
-            total: response.data.total,
-          });
-        }
-      } catch (err) {
-        console.log(err);
+    setPage(1);
+    setCompanies([]);
+
+    if (
+      (selectedOption === "Followed" || selectedOption === "My companies") &&
+      !userData
+    ) {
+      console.log("Early return");
+      return;
+    }
+    try {
+      // This should be optimized on the backend
+      let response = null;
+      switch (selectedOption) {
+        case "All":
+          response = await getAll({ page, pageSize: 10 }).unwrap();
+          setCompanies(response.data.data);
+          break;
+        case "Followed":
+          response = await getFollowed({ page, pageSize: 10 }).unwrap();
+          setCompanies(response.data.data);
+          break;
+        case "My companies":
+          response = await getMy({ page, pageSize: 10 }).unwrap();
+          setCompanies(response.data.data);
+          break;
+        default:
       }
+      if (response) {
+        setPaginationInfo({
+          currentPage: response.data.currentPage,
+          pageSize: response.data.pageSize,
+          total: response.data.total,
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
   useEffect(() => {
-    console.log(`${selectedOption}`);
-    setDisplayCompanies(!(selectedOption !== "All" && !userData));
-    console.log("Display companies: ", displayCompanies);
     loadCompanies();
-  }, [selectedOption, page]);
+  }, [selectedOption, page, isModalOpen]);
 
   const handleCreate = () => {
     if (!userData) navigate("/login");
@@ -117,8 +119,9 @@ const Companies = () => {
       {selectedOption !== "All" && !userData && (
         <Typography variant="h4">You should log in to see this data</Typography>
       )}
-      {displayCompanies &&
-        companies?.map((data) => <CompanyPreview companyData={data} />)}
+      {companies?.map((data) => (
+        <CompanyPreview companyData={data} />
+      ))}
       <EditCompany isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       {companies?.length ? (
         <PageController paginationInfo={paginationInfo} setPage={setPage} />

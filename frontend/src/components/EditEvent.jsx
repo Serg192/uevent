@@ -66,6 +66,7 @@ const EditEvent = ({ isOpen, setIsOpen, companyId, initData, initAddress }) => {
       setDate(new Date(initData.date));
       setIsFree(initData.price === 0);
       setTickets(initData.ticketsAvailable);
+      setPrice(initData.price);
       setSelectedFormat(initData.format);
       setSelectedTheme(initData.themes[0]);
     } else {
